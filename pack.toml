@@ -1,0 +1,10 @@
+[custom.all.stlc-typechecker]
+type = "local"
+path = "."
+ipkg = "stlc-typechecker.ipkg"
+test = "test/test.ipkg"
+
+[custom.all.stlc-typechecker-test]
+type = "local"
+path = "test"
+ipkg = "test.ipkg"
