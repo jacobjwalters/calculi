@@ -1,4 +1,4 @@
-package stlc-typechecker
+package calculi
 version = 0.1.0
 authors = "Jacob Walters"
 -- maintainers =
@@ -22,7 +22,7 @@ authors = "Jacob Walters"
 main = Main
 
 -- name of executable
-executable = "stlc-typechecker"
+executable = "calculi"
 -- opts =
 sourcedir = "src"
 -- builddir =

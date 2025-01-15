@@ -1,4 +1,4 @@
-package stlc-typechecker-test
+package calculi-test
 version = 0.1.0
 authors = "Jacob Walters"
 -- maintainers =
@@ -13,7 +13,7 @@ authors = "Jacob Walters"
 -- langversion
 
 -- packages to add to search path
-depends = stlc-typechecker
+depends = calculi
 
 -- modules to install
 -- modules =
@@ -22,7 +22,7 @@ depends = stlc-typechecker
 main = Main
 
 -- name of executable
-executable = "stlc-typechecker-test"
+executable = "calculi-test"
 -- opts =
 sourcedir = "src"
 -- builddir =

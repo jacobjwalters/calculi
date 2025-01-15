@@ -1,10 +1,10 @@
-[custom.all.stlc-typechecker]
+[custom.all.calculi]
 type = "local"
 path = "."
-ipkg = "stlc-typechecker.ipkg"
+ipkg = "calculi.ipkg"
 test = "test/test.ipkg"
 
-[custom.all.stlc-typechecker-test]
+[custom.all.calculi-typechecker-test]
 type = "local"
 path = "test"
 ipkg = "test.ipkg"
