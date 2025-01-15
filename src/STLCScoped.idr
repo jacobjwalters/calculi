@@ -44,7 +44,7 @@ Context = SnocList (Name, Ty)
 
 synth : Context -> Term ctx -> Maybe Ty
 synth g (Var n _) = lookup n $ asList g
-synth g (Lam n t b) = synth (g :< (n, t)) b
+synth g (Lam n t b) = Just $ Fn t !(synth (g :< (n, t)) b)
 synth g (App f a) = case (synth g f, synth g a) of
                          (Just $ Fn a1 r, Just a) => if a1 ~~ a then Just a else Nothing
                          _                        => Nothing
@@ -54,10 +54,19 @@ check g e t = case synth g e of
                    Nothing => False
                    Just t' => t ~~ t'
 
-ex1 : Term [<]
-ex1 = Lam "x" Base (Var "x" Here)
+Ex_base_id : Term [<]
+Ex_base_id = Lam "x" Base (Var "x" Here)
+
+Ex_check_base_id : check [<] Ex_base_id (Fn Base Base) = True
+Ex_check_base_id = Refl
+
+Ex_ill_typed : Term [<]
+Ex_ill_typed = Lam "x" (Fn Base Base) (Var "x" Here)
 
 failing
-  ex2 : Term [<]
-  ex2 = Lam "x" Base (Var "y" Here)
+  Ex_ill_scoped1 : Term [<] Unit
+  Ex_ill_scoped1 = Lam "x" Base (Var "y" Here)
+
+  Ex_ill_scoped2 : Term [<] Unit
+  Ex_ill_scoped2 = Lam "x" Base (Var "x" (There Here))
 
