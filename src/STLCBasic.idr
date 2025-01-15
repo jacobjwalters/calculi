@@ -10,6 +10,7 @@ Basic simply-typed lambda calculus.
 No intrinsic scoping or typing.
 -}
 
+Name : Type
 Name = String
 
 data Ty : Type where
