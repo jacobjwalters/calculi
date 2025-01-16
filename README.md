@@ -1,6 +1,6 @@
 # calculi
 
-This project is a set of different implementations and extensions of type systems for the simply typed lambda calculus (STLC).
+This project is a set of different type systems, and implementations of corresponding type checkers, for the simply typed lambda calculus (STLC).
 Generally, there is a focus on meta variables (metavars).
 
 Currently, the following calculi have been implemented:
