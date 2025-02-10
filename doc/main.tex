@@ -1,0 +1,235 @@
+\documentclass[a4paper]{report}
+
+% LaTeX defaults work arounds
+\usepackage{caption}
+
+% Fonts and Symbols
+\usepackage{amsmath,amsfonts,amssymb}
+
+% Relevant packages
+\usepackage{simplebnf}
+\usepackage{semantic}
+
+% Local definitions
+\newcommand{\Base}[0]{\mathsf{Base}}
+\newcommand{\Type}[0]{\mathsf{Type}}
+
+\newcommand{\Intro}[1]{#1-\textrm{I}}
+\newcommand{\Elim}[1]{#1-\textrm{E}}
+\newcommand{\Conv}[2]{#1 \leadsto #2}
+
+% Content
+\begin{document}
+\tableofcontents
+\chapter{STLC}
+
+\section{Base STLC}
+\subsection{Syntax}
+\begin{bnf}
+$t$ : \textsf{Term} ::=
+| $x$ : Variables
+| $t$ $s$ : Function Application
+| $\lambda x \colon \tau. t$ : Function Abstraction
+\end{bnf}
+
+\hfill\break
+In $\lambda x \colon \tau. t$, $x$ is a binding occurence, and $t$ is its scope.
+
+\noindent
+\begin{bnf}
+$\tau$ : \textsf{Type} ::=
+| $\Base$ : Base type
+| $\tau \to \sigma$ : Function type
+\end{bnf}
+
+\subsection{Typing Rules}
+\begin{figure*}[h]
+  \[
+    \inference[Base]{}
+                    {\Gamma \vdash \Base : \Type}
+    \quad
+    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
+                     {\Gamma \vdash \tau \to \sigma : \Type}
+  \]
+  
+  \caption*{Meta-level Typing Rules}
+  \label{fig:base-stlc-mltr}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[Var]{x : \tau \in \Gamma}
+                   {\Gamma \vdash x : \tau}
+    \quad
+    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
+                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
+  \]
+  \[
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+                            {\Gamma \vdash f x : \tau}
+  \]
+  
+  \caption*{Object-level Typing Rules}
+  \label{fig:base-stlc-oltr}
+\end{figure*}
+
+Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
+
+\newpage
+\section{STLC with Type-Level Meta-Variables}
+\subsection{Syntax}
+\begin{bnf}
+$t$ : \textsf{Term} ::=
+| $x$ : Variables
+| $t$ $s$ : Function Application
+| $\lambda x \colon \tau. t$ : Function Abstraction
+\end{bnf}
+
+\hfill\break
+In $\lambda x \colon \tau. t$, $x$ is a binding occurence, and $t$ is its scope.
+
+\noindent
+\begin{bnf}
+$\tau$ : \textsf{Type} ::=
+| $\Base$ : Base type
+| $\tau \to \sigma$ : Function type
+| $?m$ : Meta-Variable
+\end{bnf}
+
+$m \in M$ is a (fixed) set of meta-variables.
+
+\subsection{Typing Rules}
+\begin{figure*}[h]
+   \[
+    \inference[Base]{}
+                    {\Gamma \vdash \Base : \Type}
+    \quad
+    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
+                     {\Gamma \vdash \tau \to \sigma : \Type}
+  \]
+   \[
+    \inference[M-Var]{m \in M}
+                     {\Gamma \vdash ?m : \Type}
+  \]
+  
+  \caption*{Meta-level Typing Rules}
+  \label{fig:base-stlc-mltr}
+\end{figure*}
+
+\begin{figure*}[h]
+   \[
+    \inference[]{}
+                {\Conv{\Base}{\Base}}
+    \quad
+    \inference[]{\Conv{\tau}{\tau'} & \Conv{\sigma}{\sigma'}}
+                {\Conv{\tau \to \sigma}{\tau' \to \sigma'}}
+  \]
+   \[
+    \inference[]{}
+                {\Conv{?m}{\Base}}
+    \quad
+    \inference[]{}
+                {\Conv{?m}{\tau \to \sigma}}
+  \]
+  
+  \caption*{Convertibility Relation $\Conv{}{}$ on Types}
+  \label{fig:base-stlc-mltr}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[Var]{x : \tau \in \Gamma}
+                   {\Gamma \vdash x : \tau}
+    \quad
+    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
+                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
+  \]
+  \[
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+                            {\Gamma \vdash f x : \tau}
+  \]
+  
+  \caption*{Object-level Typing Rules}
+  \label{fig:base-stlc-oltr}
+\end{figure*}
+
+Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
+
+
+\newpage
+\section{STLC with Term-Level Meta-Variables}
+\subsection{Syntax}
+\begin{bnf}
+$t$ : \textsf{Term} ::=
+| $x$ : Variables
+| $?m$ : Variables
+| $t$ $s$ : Function Application
+| $\lambda x \colon \tau. t$ : Function Abstraction
+\end{bnf}
+
+\hfill\break
+In $\lambda x \colon \tau. t$, $x$ is a binding occurence, and $t$ is its scope.
+$m \in M$ is a (fixed) set of meta-variables.
+
+\noindent
+\begin{bnf}
+$\tau$ : \textsf{Type} ::=
+| $\Base$ : Base type
+| $\tau \to \sigma$ : Function type
+\end{bnf}
+
+\subsection{Typing Rules}
+\begin{figure*}[h]
+   \[
+    \inference[Base]{}
+                    {\Gamma \vdash \Base : \Type}
+    \quad
+    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
+                     {\Gamma \vdash \tau \to \sigma : \Type}
+  \]
+  
+  \caption*{Meta-level Typing Rules}
+  \label{fig:base-stlc-mltr}
+\end{figure*}
+
+\begin{figure*}[h]
+   \[
+    \inference[]{}
+                {\Conv{\Base}{\Base}}
+    \quad
+    \inference[]{\Conv{\tau}{\tau'} & \Conv{\sigma}{\sigma'}}
+                {\Conv{\tau \to \sigma}{\tau' \to \sigma'}}
+  \]
+   \[
+    \inference[]{}
+                {\Conv{?m}{\Base}}
+    \quad
+    \inference[]{}
+                {\Conv{?m}{\tau \to \sigma}}
+  \]
+  
+  \caption*{Convertibility Relation $\Conv{}{}$ on Terms}
+  \label{fig:base-stlc-mltr}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[Var]{x : \tau \in \Gamma}
+                   {\Gamma \vdash x : \tau}
+    \quad
+    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
+                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
+  \]
+  \[
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+                            {\Gamma \vdash f x : \tau}
+  \]
+  
+  \caption*{Object-level Typing Rules}
+  \label{fig:base-stlc-oltr}
+\end{figure*}
+
+Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
+
+
+\end{document}
