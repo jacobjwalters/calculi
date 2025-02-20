@@ -2,6 +2,14 @@
 
 % LaTeX defaults work arounds
 \usepackage{caption}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
 
 % Fonts and Symbols
 \usepackage{amsmath,amsfonts,amssymb}
@@ -46,13 +54,13 @@ $\tau$ : \textsf{Type} ::=
 \begin{figure*}[h]
   \[
     \inference[Base]{}
-                    {\Gamma \vdash \Base : \Type}
+                    {\vdash \Base : \Type}
     \quad
-    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
-                     {\Gamma \vdash \tau \to \sigma : \Type}
+    \inference[$\to$]{\vdash \tau : \Type & \vdash \sigma : \Type}
+                     {\vdash \tau \to \sigma : \Type}
   \]
   
-  \caption*{Meta-level Typing Rules}
+  \caption*{Kinding Rules}
   \label{fig:base-stlc-mltr}
 \end{figure*}
 
@@ -69,7 +77,7 @@ $\tau$ : \textsf{Type} ::=
                             {\Gamma \vdash f x : \tau}
   \]
   
-  \caption*{Object-level Typing Rules}
+  \caption*{Typing Rules}
   \label{fig:base-stlc-oltr}
 \end{figure*}
 
@@ -96,23 +104,24 @@ $\tau$ : \textsf{Type} ::=
 | $?m$ : Meta-Variable
 \end{bnf}
 
+\hfill\break
 $m \in M$ is a (fixed) set of meta-variables.
 
 \subsection{Typing Rules}
 \begin{figure*}[h]
    \[
     \inference[Base]{}
-                    {\Gamma \vdash \Base : \Type}
+                    {\vdash \Base : \Type}
     \quad
-    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
-                     {\Gamma \vdash \tau \to \sigma : \Type}
+    \inference[$\to$]{\vdash \tau : \Type & \vdash \sigma : \Type}
+                     {\vdash \tau \to \sigma : \Type}
   \]
    \[
     \inference[M-Var]{m \in M}
-                     {\Gamma \vdash ?m : \Type}
+                     {\vdash ?m : \Type}
   \]
   
-  \caption*{Meta-level Typing Rules}
+  \caption*{Kinding Rules}
   \label{fig:base-stlc-mltr}
 \end{figure*}
 
@@ -136,6 +145,8 @@ $m \in M$ is a (fixed) set of meta-variables.
   \label{fig:base-stlc-mltr}
 \end{figure*}
 
+Convertibility is subject to constraints. As an example, if we have the constraint that $?m = \Base$, then we cannot apply the $\Conv{?m}{\tau \to \sigma}$ rule.
+
 \begin{figure*}[h]
   \[
     \inference[Var]{x : \tau \in \Gamma}
@@ -145,91 +156,20 @@ $m \in M$ is a (fixed) set of meta-variables.
                              {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
   \]
   \[
-    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma'}
                             {\Gamma \vdash f x : \tau}
   \]
   
-  \caption*{Object-level Typing Rules}
+  % replace sigma with sigma' in func app, and then add convertibility constraint
+  \caption*{Typing Rules}
   \label{fig:base-stlc-oltr}
 \end{figure*}
 
 Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
+
+In \Elim{$\to$}, we enforce a constraint that $\sigma = \sigma'$.
 
 
 \newpage
 \section{STLC with Term-Level Meta-Variables}
-\subsection{Syntax}
-\begin{bnf}
-$t$ : \textsf{Term} ::=
-| $x$ : Variables
-| $?m$ : Variables
-| $t$ $s$ : Function Application
-| $\lambda x \colon \tau. t$ : Function Abstraction
-\end{bnf}
-
-\hfill\break
-In $\lambda x \colon \tau. t$, $x$ is a binding occurence, and $t$ is its scope.
-$m \in M$ is a (fixed) set of meta-variables.
-
-\noindent
-\begin{bnf}
-$\tau$ : \textsf{Type} ::=
-| $\Base$ : Base type
-| $\tau \to \sigma$ : Function type
-\end{bnf}
-
-\subsection{Typing Rules}
-\begin{figure*}[h]
-   \[
-    \inference[Base]{}
-                    {\Gamma \vdash \Base : \Type}
-    \quad
-    \inference[$\to$]{\Gamma \vdash \tau : \Type & \Gamma \vdash \sigma : \Type}
-                     {\Gamma \vdash \tau \to \sigma : \Type}
-  \]
-  
-  \caption*{Meta-level Typing Rules}
-  \label{fig:base-stlc-mltr}
-\end{figure*}
-
-\begin{figure*}[h]
-   \[
-    \inference[]{}
-                {\Conv{\Base}{\Base}}
-    \quad
-    \inference[]{\Conv{\tau}{\tau'} & \Conv{\sigma}{\sigma'}}
-                {\Conv{\tau \to \sigma}{\tau' \to \sigma'}}
-  \]
-   \[
-    \inference[]{}
-                {\Conv{?m}{\Base}}
-    \quad
-    \inference[]{}
-                {\Conv{?m}{\tau \to \sigma}}
-  \]
-  
-  \caption*{Convertibility Relation $\Conv{}{}$ on Terms}
-  \label{fig:base-stlc-mltr}
-\end{figure*}
-
-\begin{figure*}[h]
-  \[
-    \inference[Var]{x : \tau \in \Gamma}
-                   {\Gamma \vdash x : \tau}
-    \quad
-    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
-                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
-  \]
-  \[
-    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
-                            {\Gamma \vdash f x : \tau}
-  \]
-  
-  \caption*{Object-level Typing Rules}
-  \label{fig:base-stlc-oltr}
-\end{figure*}
-
-Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
-
-
 \end{document}
