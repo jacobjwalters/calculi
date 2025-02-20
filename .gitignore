@@ -4,5 +4,6 @@ doc/*.aux
 doc/*.fdb_latexmk
 doc/*.fls
 doc/*.log
-doc/*.toc
+doc/*.out
 doc/*.pdf
+doc/*.toc
