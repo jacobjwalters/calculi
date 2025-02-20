@@ -17,14 +17,11 @@ jobs:
         with:
           working_directory: doc/
           root_file: main.tex
-          
-      - name: Upload PDF file
-        uses: actions/upload-artifact@v4
-        with:
-          name: Doc PDF
-          path: doc/main.pdf
 
-      - name: Add Release
-        uses: softprops/action-gh-release@v2
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          files: Doc PDF
+          artifacts: "doc/main.pdf"
+          body: "PDF generated from doc/main.tex"
+          commit: "main"
+          tag: "latest"
