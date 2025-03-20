@@ -1,0 +1,5 @@
+||| Basic simply-typed lambda calculus.
+||| No intrinsic scoping or typing.
+module STLC.Basic.Core
+
+%hide Syntax.PreorderReasoning.Ops.infixl.(~~)  -- conflicts with our conv relation
