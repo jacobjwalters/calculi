@@ -8,3 +8,9 @@ test = "test/test.ipkg"
 type = "local"
 path = "test"
 ipkg = "test.ipkg"
+
+[custom.all.flap]
+type   = "github"
+url    = "https://github.com/yellowsquid/idris-flap"
+commit = "latest:master"
+ipkg   = "flap.ipkg"

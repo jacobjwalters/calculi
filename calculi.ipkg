@@ -13,7 +13,7 @@ authors = "Jacob Walters"
 -- langversion
 
 -- packages to add to search path
--- depends =
+depends = flap
 
 -- modules to install
 -- modules =
