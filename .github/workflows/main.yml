@@ -28,3 +28,4 @@ jobs:
           body: "PDF generated from doc/main.tex"
           commit: "main"
           tag: "latest"
+          allowUpdates: true
