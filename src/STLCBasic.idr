@@ -92,8 +92,6 @@ Eq STLCToken where
   Colon == Colon = True
   BaseT == BaseT = True
   Arrow == Arrow = True
-  Dot == Dot = True
-  Space == Space = True
   _ == _ = False
 
 Interpolation STLCToken where
