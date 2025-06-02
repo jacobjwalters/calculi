@@ -5,6 +5,14 @@ import Data.List
 import Data.SnocList
 import Data.SnocList.Elem
 import Data.SnocList.Quantifiers
+  
+import Text.Lexer
+import Flap.Parser
+import Flap.Data.Context
+import Flap.Data.Context.Var
+import Flap.Data.SnocList.Thinning
+
+%hide Flap.Data.Context.Context  -- conflicts with ?tymv
 
 %default total
 
