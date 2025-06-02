@@ -21,9 +21,6 @@ jobs:
           working_directory: doc/
           root_file: main.tex
 
-      - name: Rename generated PDF
-        run: mv main.pdf calculi.pdf
-
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
