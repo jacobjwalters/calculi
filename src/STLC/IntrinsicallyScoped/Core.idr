@@ -27,8 +27,8 @@ data Convertible : Ty -> Ty -> Type where
 
 public export
 convertible : (a, b : Ty) -> Maybe $ Convertible a b
-convertible Base Base = Just BaseConv
-convertible (Fn a1 r1) (Fn a2 r2) = Just $ FnConv !(convertible a1 a2) !(convertible r1 r2)
+convertible Base Base = [| BaseConv |]
+convertible (Fn a1 r1) (Fn a2 r2) = [| FnConv (convertible a1 a2) (convertible r1 r2) |]
 convertible _ _ = Nothing
 
 public export infixr 8 ~~
