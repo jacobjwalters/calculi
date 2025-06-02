@@ -1,0 +1,51 @@
+\section{Base STLC}
+\subsection{Syntax}
+\begin{bnf}
+$t$ : \textsf{Term} ::=
+| $x$ : Variables
+| $t$ $s$ : Function Application
+| $\lambda x \colon \tau. t$ : Function Abstraction
+\end{bnf}
+
+\hfill\break
+In $\lambda x \colon \tau. t$, $x$ is a binding occurence, and $t$ is its scope.
+
+\noindent
+\begin{bnf}
+$\tau$ : \textsf{Type} ::=
+| $\Base$ : Base type
+| $\tau \to \sigma$ : Function type
+\end{bnf}
+
+\subsection{Typing Rules}
+\begin{figure*}[h]
+  \[
+    \inference[Base]{}
+                    {\vdash \Base : \Type}
+    \quad
+    \inference[$\to$]{\vdash \tau : \Type & \vdash \sigma : \Type}
+                     {\vdash \tau \to \sigma : \Type}
+  \]
+
+  \caption*{Kinding Rules}
+  \label{fig:base-stlc-kinding}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[Var]{x : \tau \in \Gamma}
+                   {\Gamma \vdash x : \tau}
+    \quad
+    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
+                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
+  \]
+  \[
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+                            {\Gamma \vdash f x : \tau}
+  \]
+
+  \caption*{Typing Rules}
+  \label{fig:base-stlc-typing}
+\end{figure*}
+
+Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
