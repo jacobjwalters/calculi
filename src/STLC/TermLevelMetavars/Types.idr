@@ -29,6 +29,7 @@ ThC2C1 : Thinning C2 C1
 ThC2C1 = Drop "Int" (Keep "String" (Drop "Int" None))
 
 failing
+  -- There shouldn't be a thinning from C1 to C2
   ThC1C2 : Thinning C1 C2
   ThC1C2 = %search
 
