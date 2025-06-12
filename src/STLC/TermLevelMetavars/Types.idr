@@ -34,17 +34,6 @@ failing
   ThC1C2 = %search
 
 
--- Permutations
-permute : Nat -> Nat -> Context -> Context
-permute to from ctx = ?p  -- Ugly; we're computing. I read a SO answer
--- https://stackoverflow.com/questions/30551033/swap-two-elements-in-a-list-by-its-indices
--- which seems to indicate that differentiable functors should help here,
--- but I don't have the time/energy in the late afternoon to implement all of this.
-
-data Permutation : (delta : Context) -> (gamma : Context) -> Type where
-  Done : Permutation gamma gamma
-  Swap : (to, from : Nat) -> Permutation (permute to from delta) gamma
-
 
 -- Renamings
 Var : Ty -> Context -> Type
