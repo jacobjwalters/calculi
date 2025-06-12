@@ -9,9 +9,11 @@ Ty = String
 Context : Type
 Context = SnocList Ty
 
+-- TODO: better type
 Holes : Type
 Holes = List String
 
+-- TODO: what should this look like? This is the biggest hurdle imo
 Term : Holes -> Type
 Term h = Int
 
@@ -37,7 +39,7 @@ failing
 
 -- Renamings
 Var : Ty -> Context -> Type
-Var a gamma = Nat
+Var a gamma = Nat  -- dummy type while i figure things out
 
 -- TODO: not sure about this one
 Rename : (gamma, delta : Context) -> (a : Ty) {- (x : A) \in delta -}
@@ -49,3 +51,8 @@ Rename : (gamma, delta : Context) -> (a : Ty) {- (x : A) \in delta -}
 -- -[-]
 Subst : (gamma, delta : Context)
      -> Term []
+
+
+-- Meta-variable subst (bind)
+MVarSubst : h -> s -> delta -> b
+         -> Term h b delta -> (f : forall a. forall gamma. h a gamma -> Term s {-- _a (delta, gamma) -}) -> Term s {-- _b delta -}
