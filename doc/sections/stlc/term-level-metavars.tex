@@ -69,3 +69,16 @@ $\tau$ : \textsf{Type} ::=
 Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
 
 In \Elim{$\to$}, we enforce a constraint that $\sigma = \sigma'$.
+
+We also have a convertibilty relation $\leadsto$ on types. For a type system as simple as ours, this is just Eq.
+
+\subsection{Context Substitutions}
+The context substitution judgement $\Gamma \vdash \theta : \Delta$ describes a simultaneous substitution from $\Delta$ to $\Gamma$; it is read as ``given a context $\Delta$, there is a way to map its variables to those in $\Gamma$''. More formally, it is defined as $\forall (x : B) \in \Delta. \Gamma \vdash \theta (x : B)$.
+
+\subsubsection{Thinnings}
+A thinning is an order preserving injective map between contexts. Essentially, they assert that the second context is a sublist of the first.
+
+For example, let $\Gamma = x : \mathrm{Bool}, y : \mathrm{Bool}$, and $\Delta = w : \mathrm{Bool}$. Also let $\theta(x) \mapsto w; \theta(y) \mapsto w$. Then, $\theta$ is a thinning from $\Gamma$ to $\Delta$.
+
+\subsubsection{Weakenings}
+A weakening of a context $\Gamma$ extends $\Gamma$ with one extra element. For example, we may take the context $\Gamma = x : \mathrm{Bool}, y : \mathrm{Bool}$, and extend it with $z : \mathrm{Bool} \to \mathrm{Bool}$, producing $\Gamma' = x : \mathrm{Bool}, y : \mathrm{Bool}, z : \mathrm{Bool} \to \mathrm{Bool}$.
