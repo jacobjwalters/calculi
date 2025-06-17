@@ -53,8 +53,8 @@ $\tau$ : \textsf{Type} ::=
 
   \[
   \inference[?m]
-            {m : \tau \in M \quad \Gamma l/vdash \theta : \Delta}
-            {\Gamma \vdash \,?m : \tau}
+            {m \in $H_A\Delta$ \quad \Gamma \vdash \theta : \Delta}
+            {\Gamma \vdash \,?m[\theta]}
     %% \quad
     %% \inference[\Elim{?m}]
     %%           {\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma'}
