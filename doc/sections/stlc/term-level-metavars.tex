@@ -72,8 +72,10 @@ In \Elim{$\to$}, we enforce a constraint that $\sigma = \sigma'$.
 
 We also have a convertibilty relation $\leadsto$ on types. For a type system as simple as ours, this is just Eq.
 
-\subsection{Context Substitutions}
+\subsection{Context Substitutions/Renamings}
 The context substitution judgement $\Gamma \vdash \theta : \Delta$ describes a simultaneous substitution from $\Delta$ to $\Gamma$; it is read as ``given a context $\Delta$, there is a way to map its variables to those in $\Gamma$''. More formally, it is defined as $\forall (x : B) \in \Delta. \Gamma \vdash \theta (x : B)$.
+
+These can be viewed as morphisms in the free product extension over $\mathbb{S}$; the category of contexts over the category of sorts $\mathbb{S}$. They are also called ``renamings''.
 
 \subsubsection{Thinnings}
 A thinning is an order preserving injective map between contexts. Essentially, they assert that the second context is a sublist of the first.
