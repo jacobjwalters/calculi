@@ -84,3 +84,11 @@ For example, let $\Gamma = x : \mathrm{Bool}, y : \mathrm{Bool}$, and $\Delta = 
 
 \subsubsection{Weakenings}
 A weakening of a context $\Gamma$ extends $\Gamma$ with one extra element. For example, we may take the context $\Gamma = x : \mathrm{Bool}, y : \mathrm{Bool}$, and extend it with $z : \mathrm{Bool} \to \mathrm{Bool}$, producing $\Gamma' = x : \mathrm{Bool}, y : \mathrm{Bool}, z : \mathrm{Bool} \to \mathrm{Bool}$.
+
+
+\subsection{Capture Avoiding Substitution}
+Capture avoiding substition takes a term in $\Gamma$, and a substitution from variables in $\Gamma$ to terms in $\Delta$. It then applies the substitution to the variables in the term. Importantly, it's capture avoiding. In our case, this corresponds to the usual definition of CAS, but when changing your calculus, make sure to extend this to other binders outside of lambda.
+
+\subsection{Meta Substitution}
+Meta substitution is a form of monadic bind.
+It takes a term in $\Delta$, with holes in $H$, and a substitution from variables in $\Gamma$ over $H$ to functors from terms in $\Delta$ to terms in $\Gamma$, both over $S$. It produces a term in $\Delta$ over $S$.
