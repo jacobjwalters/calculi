@@ -35,13 +35,16 @@ Family = Context -> Type
 SortedFamily : Type
 SortedFamily = Ty -> Family
 
+Holes = SortedFamily
+
 ||| Sorted family substitution. Gamma |- theta : Delta
 ||| This asserts that all elements in delta are also present in gamma.
 ||| In effect, delta is a subset of gamma.
+||| Also called renaming.
 (.subst) : SortedFamily -> Context -> Family
 s.subst delta gamma = All (\ty => s ty gamma) delta
 
-data Term : SortedFamily -> SortedFamily where
+data Term : Holes -> SortedFamily where
   ||| Var assers that there is a variable with type ty in gamma, and produces a term.
   Var : Elem ty gamma
      -> Term hole ty gamma
@@ -50,13 +53,12 @@ data Term : SortedFamily -> SortedFamily where
   Abs : Term hole sigma (gamma :< tau)
      -> Term hole (Fn tau sigma) gamma
   ||| Application. We force convertibility between the types of each term.
-  App : Term hole sigma_to_tau gamma -> Term hole sigma' gamma -> sigma_to_tau ~> (Fn sigma' tau)
+  App : Term hole sigma_to_tau gamma -> Term hole sigma' gamma -> (0 conv : sigma_to_tau ~> (Fn sigma' tau))
      -> Term hole tau gamma
   ||| Meta-variables (?m).
   ||| m is a hole of type ty in some context delta, and there exists a subsitution from delta to gamma.
   ||| Given these, we can produce a term ?m in gamma.
-  MVar : {0 hole : SortedFamily}
-      -> (m : hole ty delta) -> (Term hole).subst delta gamma
+  MVar : (m : hole ty delta) -> (Term hole).subst delta gamma
       -> Term hole ty gamma
 
 -- Thinnings
@@ -91,6 +93,7 @@ failing
   ThC1C2 : Thinning C1 C2
   ThC1C2 = %search
 
+{-
 -- Renaming  plfa de bruijn
 weaken : (rho : Elem a gamma -> Elem a delta) -> (Elem a (gamma :< b) -> Elem a (delta :< b))
 weaken rho Here = Here
@@ -113,8 +116,17 @@ subst (Var x) sigma = sigma x
 subst (Abs b) sigma = Abs (subst b (subweaken sigma))
 subst (App f x c) sigma = App (subst f sigma) (subst x sigma) c
 subst (MVar m theta) sigma = ?sm
-
+-}
 
 -- Meta-variable subst (bind)
---MVarSubst : h -> s -> delta -> b
-         ---> Term (?hl) b delta -> (f : forall a. forall gamma. h a gamma -> Term s {-- _a (delta, gamma) -}) -> Term s {-- _b delta -}
+MVarRename : {H : Holes} -> {A : Ty} -> {Gamma, Delta : Context}
+          -> H A Gamma -> (Term H).subst Gamma Delta -> H A Delta
+MVarRename h rho = ?f h  -- TODO: how can I actually get the substitution out of All?
+
+MVarSubst : {H, S : Holes} -> {B : Ty} -> {Delta : Context}
+         -> Term H B Delta -> (f : {A : Ty} -> {Gamma : Context} -> H A Gamma -> Term S A Gamma)
+         -> Term S B Delta
+MVarSubst (Var x) f = Var x
+MVarSubst (Abs x) f = Abs (MVarSubst x f)
+MVarSubst (App x y conv) f = App (?MVarSubst1 x f) (?MVarSubst2 y f) conv  -- TODO: accessibility issues here
+MVarSubst (MVar m x ) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
