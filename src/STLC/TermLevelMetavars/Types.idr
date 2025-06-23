@@ -59,7 +59,8 @@ data Term : Holes -> SortedFamily where
   ||| Meta-variables (?m).
   ||| m is a hole of type ty in some context delta, and there exists a subsitution from delta to gamma.
   ||| Given these, we can produce a term ?m in gamma.
-  MVar : (m : hole ty delta) -> (Term hole).subst delta gamma
+  MVar : {delta, gamma : Context}
+      -> (m : hole ty delta) -> (Term hole).subst delta gamma
       -> Term hole ty gamma
 
 -- Thinnings
