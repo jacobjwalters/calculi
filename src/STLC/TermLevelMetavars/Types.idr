@@ -53,7 +53,8 @@ data Term : Holes -> SortedFamily where
   Abs : Term hole sigma (gamma :< tau)
      -> Term hole (Fn tau sigma) gamma
   ||| Application. We force convertibility between the types of each term.
-  App : Term hole sigma_to_tau gamma -> Term hole sigma' gamma -> (0 conv : sigma_to_tau ~> (Fn sigma' tau))
+  App : {sigma_to_tau, sigma' : Ty}  -- Needs to be accessible for MVarSubst
+     -> Term hole sigma_to_tau gamma -> Term hole sigma' gamma -> (0 conv : sigma_to_tau ~> (Fn sigma' tau))
      -> Term hole tau gamma
   ||| Meta-variables (?m).
   ||| m is a hole of type ty in some context delta, and there exists a subsitution from delta to gamma.
@@ -138,5 +139,5 @@ MVarSubst : {H, S : Holes} -> {B : Ty} -> {Delta : Context}
          -> Term S B Delta
 MVarSubst (Var x) f = Var x
 MVarSubst (Abs x) f = Abs (MVarSubst x f)
-MVarSubst (App x y conv) f = App (?MVarSubst1 x f) (?MVarSubst2 y f) conv  -- TODO: accessibility issues here
-MVarSubst (MVar m x ) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
+MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
+MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
