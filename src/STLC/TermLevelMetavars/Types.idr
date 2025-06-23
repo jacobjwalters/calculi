@@ -37,6 +37,9 @@ SortedFamily = Ty -> Family
 
 Holes = SortedFamily
 
+data Hole : Holes where
+  Poke : (ty : Ty) -> (gamma : Context) -> Hole ty gamma
+
 ||| Sorted family substitution. Gamma |- theta : Delta
 ||| This asserts that all elements in delta are also present in gamma.
 ||| In effect, delta is a subset of gamma.
@@ -113,3 +116,11 @@ MVarSubst (Var x) f = Var x
 MVarSubst (Abs x) f = Abs (MVarSubst x f)
 MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
 MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
+
+{-
+Here's a test metavariable, using our stubbed hole definition.
+Our metavariable is of type Base, and has the context Delta := [<Fn Base Base].
+Our substitution sends the Base in Gamma := [<Base] (from the type signature) to a constant function.
+-}
+test : Term Hole Base [<Base]
+test = MVar (Poke Base [<Fn Base Base]) [<Abs (Var $ There Here)]
