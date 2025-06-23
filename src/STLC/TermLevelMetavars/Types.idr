@@ -104,31 +104,6 @@ Renaming1b = [<Var (There (There Here))]
 Renaming2 : (Term hole).subst C2 C1
 Renaming2 = [<Abs (Var Here), Var Here, Abs (Var (There Here)), Var Here]
 
-{-
--- Renaming  plfa de bruijn
-weaken : (rho : Elem a gamma -> Elem a delta) -> (Elem a (gamma :< b) -> Elem a (delta :< b))
-weaken rho Here = Here
-weaken rho (There x) = There (rho x)
-
-rename : (rho : {0 a : Ty} -> Elem a gamma -> Elem a delta) -> (Term hole a gamma -> Term hole a delta)
-rename rho (Var x) = Var (rho x)
-rename rho (Abs b) = Abs (rename (weaken rho) b)
-rename rho (App f x c) = App (rename rho f) (rename rho x) c
-rename rho (MVar m x) = MVar ?mr ?xr
-
--- Capture avoiding subst
--- -[-]
-subweaken : (sigma : Elem a gamma -> Term hole a delta) -> (Elem a (gamma :< b) -> Term hole a (delta :< b))
-subweaken sigma Here = Var Here
-subweaken sigma (There x) = rename There (sigma x)
-
-subst : Term hole b gamma -> (sigma : {0 a : Ty} -> Elem a gamma -> Term hole a delta) -> Term hole b delta
-subst (Var x) sigma = sigma x
-subst (Abs b) sigma = Abs (subst b (subweaken sigma))
-subst (App f x c) sigma = App (subst f sigma) (subst x sigma) c
-subst (MVar m theta) sigma = ?sm
--}
-
 -- Meta-variable subst (bind)
 MVarRename : {H : Holes} -> {A : Ty} -> {Gamma, Delta : Context}
           -> H A Gamma -> (Term H).subst Gamma Delta -> H A Delta
