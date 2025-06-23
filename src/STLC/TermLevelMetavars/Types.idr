@@ -105,10 +105,6 @@ Renaming2 : (Term hole).subst C2 C1
 Renaming2 = [<Abs (Var Here), Var Here, Abs (Var (There Here)), Var Here]
 
 -- Meta-variable subst (bind)
-MVarRename : {H : Holes} -> {A : Ty} -> {Gamma, Delta : Context}
-          -> H A Gamma -> (Term H).subst Gamma Delta -> H A Delta
-MVarRename h rho = ?f h  -- TODO: how can I actually get the substitution out of All?
-
 MVarSubst : {H, S : Holes} -> {B : Ty} -> {Delta : Context}
          -> Term H B Delta -> (f : {A : Ty} -> {Gamma : Context} -> H A Gamma -> Term S A Gamma)
          -> Term S B Delta
