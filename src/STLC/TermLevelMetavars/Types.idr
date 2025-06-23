@@ -93,6 +93,16 @@ failing
   ThC1C2 : Thinning C1 C2
   ThC1C2 = %search
 
+||| There are renamings from C1 to C2, by embedding the singular Base type in C1 to a variable term in C2, which points to either of the Base types in C2.
+Renaming1a, Renaming1b : (Term hole).subst C1 C2
+Renaming1a = [<Var Here]
+Renaming1b = [<Var (There (There Here))]
+
+||| There is a renaming from C2 to C1, by mapping all of the Base types in C2 to variable terms referring to the singular Base type in C1, and creating lambda terms for the function types in C2.
+||| The first function is the identity, and doesn't know about the Base type in C1. The second function is the constant function on the Base type in C1, discarding its argument (of type Base -> Base).
+Renaming2 : (Term hole).subst C2 C1
+Renaming2 = [<Abs (Var Here), Var Here, Abs (Var (There Here)), Var Here]
+
 {-
 -- Renaming  plfa de bruijn
 weaken : (rho : Elem a gamma -> Elem a delta) -> (Elem a (gamma :< b) -> Elem a (delta :< b))
