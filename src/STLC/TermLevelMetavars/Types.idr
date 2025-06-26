@@ -63,7 +63,7 @@ data Term : Holes -> SortedFamily where
   ||| Meta-variables (?m).
   ||| m is a hole of type ty in some context delta, and there exists a subsitution from delta to gamma.
   ||| Given these, we can produce a term ?m in gamma.
-  MVar : {delta, gamma : Context}
+  MVar : {0 delta, gamma : Context}
       -> (m : hole ty delta) -> (theta : (Term hole).subst delta gamma)
       -> Term hole ty gamma
 
@@ -112,18 +112,16 @@ Renaming2 = [<Abs (Var Here), Var Here, Abs (Var (There Here)), Var Here]
 -- Extend the context within a term
 extTerm : (tau : Ty) -> Term h a gamma -> Term h a (gamma :< tau)
 extTerm tau (Var x) = Var (There x)
-extTerm t (Abs x) = ?eab  -- TODO: stuck here
+extTerm tau (Abs x) = Abs ?eab_0  -- TODO: stuck here
 extTerm tau (App x y conv) = App (extTerm tau x) (extTerm tau y) conv
-extTerm tau (MVar m theta) = MVar m theta'
-  where theta' : All (\ty => Term h ty (gamma :< tau)) delta
-        theta' = mapProperty (\p => ?pr) ?thetaa  -- TODO: convince idris that theta delta is theta' delta. Maybe we make delta explicit in the MVar constructor?
+extTerm tau (MVar m theta) = MVar m $ mapProperty (extTerm tau) theta
 
 -- Meta-variable subst (bind)
-MVarSubst : {H, S : Holes} -> {B : Ty} -> {Delta : Context}
-         -> Term H B Delta -> (f : {A : Ty} -> {Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
+MVarSubst : {0 H, S : Holes} -> {0 B : Ty} -> {0 Delta : Context}
+         -> Term H B Delta -> (f : {0 A : Ty} -> {0 Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
          -> Term S B Delta
 MVarSubst (Var x) f = Var x
-MVarSubst (Abs x) f = Abs (MVarSubst x ?mvs)
+MVarSubst (Abs x) f = Abs (MVarSubst x (extTerm ?ty . f))
 MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
 MVarSubst (MVar m theta) f = ?mv
 --MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
@@ -143,7 +141,7 @@ testf is a meta substitution which applies idRename to the context, and creates 
 -}
 idRename : (delta : Context) -> All (\ty => Term Hole ty delta) delta
 idRename [<] = [<]
-idRename (sx :< x) = mapProperty (\p => extTerm x $ p) (idRename sx) :< Var Here
+idRename (sx :< x) = mapProperty (extTerm x) (idRename sx) :< Var Here
 
 testf : {delta : Context} -> Hole a delta -> Term Hole a delta
 testf (Poke a delta) = MVar (Poke a delta) (idRename delta)
