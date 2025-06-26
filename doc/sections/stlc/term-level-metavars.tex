@@ -91,4 +91,8 @@ Capture avoiding substition takes a term in $\Gamma$, and a substitution from va
 
 \subsection{Meta Substitution}
 Meta substitution is a form of monadic bind.
-It takes a hole $H$ in $\Gamma$, and a substitution from terms in $\Gamma$ over $H$ to functors from terms in $\Delta$ to terms in $\Gamma$, both over $S$. It produces a term in $\Delta$ over $S$.
+It takes a hole $H$ in $\Gamma$, and a substitution from terms in $\Gamma$ over $H$ to terms in $\Gamma$ extended by $\Delta$ over $S$. It produces a term in $\Delta$ over $S$.
+
+\[
+  t >>= (m \in H_A\Gamma \mapsto \Gamma, \Delta \vdash M : A)
+\]
