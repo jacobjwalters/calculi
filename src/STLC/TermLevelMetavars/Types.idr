@@ -53,7 +53,8 @@ data Term : Holes -> SortedFamily where
      -> Term hole ty gamma
   ||| Abs is lambda abstraction.
   ||| We take a term of type sigma with gamma extended with type tau, and produce a term of type tau -> sigma in gamma.
-  Abs : Term hole sigma (gamma :< tau)
+  Abs : {tau : Ty}
+     -> Term hole sigma (gamma :< tau)
      -> Term hole (Fn tau sigma) gamma
   ||| Application. We force convertibility between the types of each term.
   App : {sigma_to_tau, sigma' : Ty}  -- Needs to be accessible for MVarSubst
@@ -63,7 +64,7 @@ data Term : Holes -> SortedFamily where
   ||| m is a hole of type ty in some context delta, and there exists a subsitution from delta to gamma.
   ||| Given these, we can produce a term ?m in gamma.
   MVar : {delta, gamma : Context}
-      -> (m : hole ty delta) -> (Term hole).subst delta gamma
+      -> (m : hole ty delta) -> (theta : (Term hole).subst delta gamma)
       -> Term hole ty gamma
 
 -- Thinnings
@@ -108,19 +109,41 @@ Renaming1b = [<Var (There (There Here))]
 Renaming2 : (Term hole).subst C2 C1
 Renaming2 = [<Abs (Var Here), Var Here, Abs (Var (There Here)), Var Here]
 
+-- Extend the context within a term
+extTerm : (tau : Ty) -> Term h a gamma -> Term h a (gamma :< tau)
+extTerm tau (Var x) = Var (There x)
+extTerm t (Abs x) = ?eab  -- TODO: stuck here
+extTerm tau (App x y conv) = App (extTerm tau x) (extTerm tau y) conv
+extTerm tau (MVar m theta) = MVar m theta'
+  where theta' : All (\ty => Term h ty (gamma :< tau)) delta
+        theta' = mapProperty (\p => ?pr) ?thetaa  -- TODO: convince idris that theta delta is theta' delta. Maybe we make delta explicit in the MVar constructor?
+
 -- Meta-variable subst (bind)
 MVarSubst : {H, S : Holes} -> {B : Ty} -> {Delta : Context}
-         -> Term H B Delta -> (f : {A : Ty} -> {Gamma : Context} -> H A Gamma -> Term S A Gamma)
+         -> Term H B Delta -> (f : {A : Ty} -> {Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
          -> Term S B Delta
 MVarSubst (Var x) f = Var x
-MVarSubst (Abs x) f = Abs (MVarSubst x f)
+MVarSubst (Abs x) f = Abs (MVarSubst x ?mvs)
 MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
-MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
+MVarSubst (MVar m theta) f = ?mv
+--MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
 
 {-
 Here's a test metavariable, using our stubbed hole definition.
 Our metavariable is of type Base, and has the context Delta := [<Fn Base Base].
 Our substitution sends the Base in Gamma := [<Base] (from the type signature) to a constant function.
 -}
-test : Term Hole Base [<Base]
-test = MVar (Poke Base [<Fn Base Base]) [<Abs (Var $ There Here)]
+testmv : Term Hole Base [<Base]
+testmv = MVar (Poke Base [<Fn Base Base]) [<Abs (Var $ There Here)]
+
+{-
+Now, here's a meta variable substitution function f. We're mapping to the same type of hole because I'm lazy.
+idRename is the identity renaming, which sends a context to itself
+testf is a meta substitution which applies idRename to the context, and creates an MVar term for each hole.
+-}
+idRename : (delta : Context) -> All (\ty => Term Hole ty delta) delta
+idRename [<] = [<]
+idRename (sx :< x) = mapProperty (\p => extTerm x $ p) (idRename sx) :< Var Here
+
+testf : {delta : Context} -> Hole a delta -> Term Hole a delta
+testf (Poke a delta) = MVar (Poke a delta) (idRename delta)
