@@ -136,12 +136,12 @@ testmv = MVar (Poke Base [<Fn Base Base]) [<Abs Base (Var $ There Here)]
 
 {-
 Now, here's a meta variable substitution function f. We're mapping to the same type of hole because I'm lazy.
-idRename is the identity renaming, which sends a context to itself
-testf is a meta substitution which applies idRename to the context, and creates an MVar term for each hole.
+idRename is the identity renaming, which sends a context to itself.
+idf is a meta substitution which applies idRename to the context, and creates an MVar term for each hole. It's the identity mvsub.
 -}
 idRename : (delta : Context) -> All (\ty => Term Hole ty delta) delta
 idRename [<] = [<]
 idRename (sx :< x) = mapProperty (extTerm x) (idRename sx) :< Var Here
 
-testf : {delta : Context} -> Hole a delta -> Term Hole a delta
-testf (Poke a delta) = MVar (Poke a delta) (idRename delta)
+idf : {delta : Context} -> Hole a delta -> Term Hole a delta
+idf (Poke a delta) = MVar (Poke a delta) (idRename delta)
