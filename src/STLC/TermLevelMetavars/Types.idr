@@ -47,9 +47,12 @@ data Hole : Holes where
 (.subst) : SortedFamily -> Context -> Family
 s.subst delta gamma = All (\ty => s ty gamma) delta
 
+Variable : Ty -> Context -> Type
+Variable = Elem
+
 data Term : Holes -> SortedFamily where
-  ||| Var assers that there is a variable with type ty in gamma, and produces a term.
-  Var : Elem ty gamma
+  ||| Var asserts that there is a variable with type ty in gamma, and produces a term.
+  Var : Variable ty gamma
      -> Term hole ty gamma
   ||| Abs is lambda abstraction.
   ||| We take a term of type sigma with gamma extended with type tau, and produce a term of type tau -> sigma in gamma.
@@ -99,6 +102,13 @@ failing
   ThC1C2 : Thinning C1 C2
   ThC1C2 = %search
 
+idThinning : (delta : Context) -> Thinning delta delta
+idThinning [<] = None
+idThinning (sx :< x) = Keep x (idThinning sx)
+
+dropOne : (tau : Ty) -> (delta : Context) -> Thinning (delta :< tau) delta
+dropOne tau delta = Drop tau (idThinning delta)
+
 ||| There are renamings from C1 to C2, by embedding the singular Base type in C1 to a variable term in C2, which points to either of the Base types in C2.
 Renaming1a, Renaming1b : (Term hole).subst C1 C2
 Renaming1a = [<Var Here]
@@ -109,22 +119,45 @@ Renaming1b = [<Var (There (There Here))]
 Renaming2 : (Term hole).subst C2 C1
 Renaming2 = [<Abs Base (Var Here), Var Here, Abs (Fn Base Base) (Var (There Here)), Var Here]
 
--- Extend the context within a term
-extTerm : (tau : Ty) -> Term h a gamma -> Term h a (gamma :< tau)
-extTerm tau (Var x) = Var (There x)
-extTerm tau (Abs ty x) = Abs ty (extTerm ty ?tx)  -- TODO: stuck here
-extTerm tau (App x y conv) = App (extTerm tau x) (extTerm tau y) conv
-extTerm tau (MVar m theta) = MVar m $ mapProperty (extTerm tau) theta
+renameVar : (thn : Thinning delta gamma) -> Variable ty gamma -> Variable ty delta
+renameVar (Drop ty tau) x = There (renameVar tau x)
+renameVar (Keep ty tau) Here = Here
+renameVar (Keep ty tau) (There x) = There (renameVar tau x)
 
--- Meta-variable subst (bind)
+||| CAS type
+0 Substitution : (h : Holes) -> (Gamma, Delta : Context) -> Type
+Substitution h gamma delta = (0 ty : Ty) -> Variable ty delta -> Term h ty gamma
+
+||| Weaken a context by a term
+weakenTerm : (thn : Thinning delta gamma) -> Term h a gamma -> Term h a delta
+weakenTerm thn (Var x) = Var (renameVar thn x)
+weakenTerm thn (Abs tau body) = Abs tau (weakenTerm (Keep tau thn) body)
+weakenTerm thn (App f x conv) = App (weakenTerm thn f) (weakenTerm thn x) conv
+weakenTerm thn (MVar m theta) = MVar m $ mapProperty (weakenTerm thn) theta
+
+||| Map between substitutions via a thinning
+thinSub : Substitution h gamma delta -> Thinning gamma' gamma -> Substitution h gamma' delta
+thinSub sigma thn ty v = weakenTerm thn (sigma ty v)
+
+||| Capture avoiding substitution
+subst : {delta : Context} -> (sigma : Substitution h delta gamma) -> Term h a gamma -> Term h a delta
+subst sigma (Var x) = sigma a x
+subst sigma (Abs tau x) = Abs tau (subst ?sg ?xx)
+subst sigma (App f x conv) = App (subst sigma f) (subst sigma x) conv
+subst sigma (MVar m theta) = MVar m $ mapProperty (subst sigma) theta
+
+||| Meta-variable subst (bind)
 MVarSubst : {0 H, S : Holes} -> {0 B : Ty} -> {0 Delta : Context}
          -> Term H B Delta -> (f : {0 A : Ty} -> {0 Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
          -> Term S B Delta
-MVarSubst (Var x) f = Var x
-MVarSubst (Abs ty x) f = Abs ty (MVarSubst x (extTerm ty . f))
-MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
-MVarSubst (MVar m theta) f = ?mv
+
+-- MVarSubst (Var x) f = Var x
+-- MVarSubst (Abs ty x) f = Abs ty (MVarSubst x (extTerm ty . f))
+-- MVarSubst (App x y conv) f = App (MVarSubst x f) (MVarSubst y f) conv
+-- MVarSubst (MVar m theta) f = ?mv
 --MVarSubst (MVar m x) f = f (?mm)  -- TODO: m : H B delta; mm : H B Delta. How to convince Idris these are the same?
+
+{-
 
 {-
 Here's a test metavariable, using our stubbed hole definition.
@@ -137,11 +170,12 @@ testmv = MVar (Poke Base [<Fn Base Base]) [<Abs Base (Var $ There Here)]
 {-
 Now, here's a meta variable substitution function f. We're mapping to the same type of hole because I'm lazy.
 idRename is the identity renaming, which sends a context to itself.
-idf is a meta substitution which applies idRename to the context, and creates an MVar term for each hole. It's the identity mvsub.
+idsub is a meta substitution which applies idRename to the context, and creates an MVar term for each hole. It's the identity mvsub.
 -}
 idRename : (delta : Context) -> All (\ty => Term Hole ty delta) delta
 idRename [<] = [<]
 idRename (sx :< x) = mapProperty (extTerm x) (idRename sx) :< Var Here
 
-idf : {delta : Context} -> Hole a delta -> Term Hole a delta
-idf (Poke a delta) = MVar (Poke a delta) (idRename delta)
+idsub : {delta : Context} -> Hole a delta -> Term Hole a delta
+idsub (Poke a delta) = MVar (Poke a delta) (idRename delta)
+-}
