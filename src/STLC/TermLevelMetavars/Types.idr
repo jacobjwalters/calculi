@@ -119,34 +119,59 @@ Renaming1b = [<Var (There (There Here))]
 Renaming2 : (Term hole).subst C2 C1
 Renaming2 = [<Abs Base (Var Here), Var Here, Abs (Fn Base Base) (Var (There Here)), Var Here]
 
-renameVar : (thn : Thinning delta gamma) -> Variable ty gamma -> Variable ty delta
-renameVar (Drop ty tau) x = There (renameVar tau x)
-renameVar (Keep ty tau) Here = Here
-renameVar (Keep ty tau) (There x) = There (renameVar tau x)
+Renaming : {hole : Holes} -> (delta, gamma : Context) -> Type
+Renaming delta gamma = (Term hole).subst delta gamma
 
-||| CAS type
+thinVar : (thn : Thinning delta gamma) -> Variable ty gamma -> Variable ty delta
+thinVar (Drop ty tau) x = There (thinVar tau x)
+thinVar (Keep ty tau) Here = Here
+thinVar (Keep ty tau) (There x) = There (thinVar tau x)
+
+||| A simultaneous substitution. It maps from variables in one context to terms in another.
 0 Substitution : (h : Holes) -> (Gamma, Delta : Context) -> Type
-Substitution h gamma delta = (0 ty : Ty) -> Variable ty delta -> Term h ty gamma
+Substitution h gamma delta = (0 ty : Ty) -> Variable ty gamma -> Term h ty delta
 
 ||| Weaken a context by a term
-weakenTerm : (thn : Thinning delta gamma) -> Term h a gamma -> Term h a delta
-weakenTerm thn (Var x) = Var (renameVar thn x)
-weakenTerm thn (Abs tau body) = Abs tau (weakenTerm (Keep tau thn) body)
-weakenTerm thn (App f x conv) = App (weakenTerm thn f) (weakenTerm thn x) conv
-weakenTerm thn (MVar m theta) = MVar m $ mapProperty (weakenTerm thn) theta
+thinTerm : (thn : Thinning delta gamma) -> Term h a gamma -> Term h a delta
+thinTerm thn (Var x) = Var (thinVar thn x)
+thinTerm thn (Abs tau body) = Abs tau (thinTerm (Keep tau thn) body)
+thinTerm thn (App f x conv) = App (thinTerm thn f) (thinTerm thn x) conv
+thinTerm thn (MVar m theta) = MVar m $ mapProperty (thinTerm thn) theta
 
-||| Map between substitutions via a thinning
-thinSub : Substitution h gamma delta -> Thinning gamma' gamma -> Substitution h gamma' delta
-thinSub sigma thn ty v = weakenTerm thn (sigma ty v)
+||| Map between substitutions via a thinning (codomain)
+thinSub : Thinning gamma gamma' -> Substitution h gamma delta -> Substitution h gamma' delta
+thinSub thn sigma ty v = sigma ty (thinVar thn v)
 
-||| Capture avoiding substitution
-subst : {delta : Context} -> (sigma : Substitution h delta gamma) -> Term h a gamma -> Term h a delta
+||| Map between substitutions via a thinning (domain)
+thinSub' : Thinning delta' delta -> Substitution h gamma delta -> Substitution h gamma delta'
+thinSub' thn sigma ty v = thinTerm thn (sigma ty v)
+
+||| Given a map from Gamma to Delta, produce a map from Gamma, tau to Delta, tau.
+weakenVar : (rho : Variable ty gamma -> Variable ty delta) -> Variable ty (gamma :< tau) -> Variable ty (delta :< tau)
+weakenVar rho Here = Here
+weakenVar rho (There x) = There (rho x)
+
+||| Given a map from vars in Gamma to vars in Delta, promote it to terms.
+weakenTerm : (rho : {0 ty : Ty} -> Variable ty gamma -> Variable ty delta) -> Term h a gamma -> Term h a delta
+weakenTerm rho (Var x) = Var (rho {ty=a} x)
+weakenTerm rho (Abs t b) = Abs t (weakenTerm (weakenVar rho) b)
+weakenTerm rho (App f x conv) = App (weakenTerm rho f) (weakenTerm rho x) conv
+weakenTerm rho (MVar m theta) = MVar m $ mapProperty (weakenTerm rho) theta
+
+||| Given a simultaneous substitution from Delta to Gamma, produce a map from the first context extended to the second context extended.
+weakenSub : {tau : Ty} -> Substitution h gamma delta -> Substitution h (gamma :< tau) (delta :< tau)
+weakenSub sigma tau Here     = Var Here
+weakenSub sigma ty (There x) = weakenTerm There (sigma ty x)  -- Take the term from the provided sigma
+
+||| Capture avoiding substitution. Given a map from vars in gamma to terms in delta, we can take a term in gamma and produce a term in delta.
+subst : {delta : Context} -> (sigma : Substitution h gamma delta) -> Term h a gamma -> Term h a delta
 subst sigma (Var x) = sigma a x
-subst sigma (Abs tau x) = Abs tau (subst ?sg ?xx)
+subst sigma (Abs tau b) = Abs tau (subst (weakenSub sigma) b)
 subst sigma (App f x conv) = App (subst sigma f) (subst sigma x) conv
 subst sigma (MVar m theta) = MVar m $ mapProperty (subst sigma) theta
 
-||| Meta-variable subst (bind)
+||| Meta-variable subst (bind).
+||| Given a term with holes in H over Delta, and a substitution from a hole in H over Gamma to a term with holes in S over Gamma, Delta; produce a term with holes in S over Delta.
 MVarSubst : {0 H, S : Holes} -> {0 B : Ty} -> {0 Delta : Context}
          -> Term H B Delta -> (f : {0 A : Ty} -> {0 Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
          -> Term S B Delta
