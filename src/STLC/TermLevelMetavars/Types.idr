@@ -131,6 +131,10 @@ thinVar (Keep ty tau) (There x) = There (thinVar tau x)
 0 Substitution : (h : Holes) -> (Gamma, Delta : Context) -> Type
 Substitution h gamma delta = (0 ty : Ty) -> Variable ty gamma -> Term h ty delta
 
+RenamingToSubstitution : Renaming {hole=h} delta gamma -> Substitution h delta gamma
+RenamingToSubstitution (r :< y) ty Here = y
+RenamingToSubstitution (r :< y) ty (There v) = RenamingToSubstitution r ty v
+
 ||| Weaken a context by a term
 thinTerm : (thn : Thinning delta gamma) -> Term h a gamma -> Term h a delta
 thinTerm thn (Var x) = Var (thinVar thn x)
@@ -172,9 +176,13 @@ subst sigma (MVar m theta) = MVar m $ mapProperty (subst sigma) theta
 
 ||| Meta-variable subst (bind).
 ||| Given a term with holes in H over Delta, and a substitution from a hole in H over Gamma to a term with holes in S over Gamma, Delta; produce a term with holes in S over Delta.
-MVarSubst : {0 H, S : Holes} -> {0 B : Ty} -> {0 Delta : Context}
+MVarSubst : {0 H, S : Holes} -> {0 B : Ty} -> {Delta : Context}
          -> Term H B Delta -> (f : {0 A : Ty} -> {0 Gamma : Context} -> H A Gamma -> Term S A (Gamma ++ Delta))
          -> Term S B Delta
+MVarSubst (Var x) f = Var x
+MVarSubst (Abs tau x) f = Abs tau (MVarSubst x (weakenTerm There . f))
+MVarSubst (App fn arg conv) f = App (MVarSubst fn f) (MVarSubst arg f) conv
+MVarSubst (MVar m theta) f = let sub = RenamingToSubstitution theta in ?mvs Delta (\ty, v => MVarSubst (sub ty v) f) (f m)
 
 -- MVarSubst (Var x) f = Var x
 -- MVarSubst (Abs ty x) f = Abs ty (MVarSubst x (extTerm ty . f))
