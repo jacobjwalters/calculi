@@ -208,3 +208,33 @@ MVarSubst (App fn arg conv) f = App (MVarSubst fn f) (MVarSubst arg f) conv
 MVarSubst (MVar m theta) f =
   let theta' = RenamingToSubstitution $ mapProperty (`MVarSubst` f) theta
   in subst (joinSubstitution Delta theta') (f m)
+
+data MyHoles : SortedFamily where
+  M0 : MyHoles (Base) [<Base `Fn` Base]
+  M1 : MyHoles (Base `Fn` Base) [<Base, Base `Fn` Base]
+
+0
+Coprod : (f : a -> SortedFamily) -> SortedFamily
+Coprod {a} f ty ctx = (i : a ** f i ty ctx)
+
+0
+MyHoles' : SortedFamily
+MyHoles' = Coprod {a = Nat} (\n => MyHoles)
+
+IdTerm : Term hole (Base `Fn` Base) ctx
+IdTerm = Abs Base $ Var Here
+
+Ex1 : Term MyHoles' Base [<]
+Ex1 = App (MVar (500 ** M1) [< MVar (0 ** M0) [< IdTerm ], IdTerm])
+          (MVar (1 ** M0) [< IdTerm ])
+      (ConvFn ConvBase ConvBase)
+
+RepId : (n : Nat) -> Term holes (Base `Fn` Base) ctx
+RepId 0 = IdTerm
+RepId (S k) = App (Abs (Base `Fn` Base) $ Var Here) (RepId k)
+  (ConvFn (ConvFn ConvBase ConvBase) (ConvFn ConvBase ConvBase))
+
+Ex2 : Term MyHoles Base [<]
+Ex2 = MVarSubst Ex1 $ \case
+  (i ** M0) => MVar M0 [< Var Here]
+  (i ** M1) => RepId i
