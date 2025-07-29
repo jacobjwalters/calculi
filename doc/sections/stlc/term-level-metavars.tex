@@ -91,7 +91,13 @@ Capture avoiding substition takes a term in $\Gamma$, and a substitution from va
 
 \subsection{Meta Substitution}
 Meta substitution is a form of monadic bind.
-It takes a hole $H$ in $\Gamma$, and a substitution from terms in $\Gamma$ over $H$ to terms in $\Gamma$ extended by $\Delta$ over $S$. It produces a term in $\Delta$ over $S$.
+It takes a metavariable $m$ , consisting of a hole $H$ in $\Gamma$, and a renaming $\theta$ from $\Gamma$ to $\Delta$ (i.e. an environment for $\Gamma$ in context $\Delta$ with holes in $H$), and a renaming $f$ from terms in $\Gamma$ over $H$ to terms in $\Gamma$ extended by $\Delta$ over $S$. It produces a term in $\Delta$ over $S$ as follows:
+\begin{itemize}
+\item Perform meta substitution on $\theta$ to get a renaming $\theta'$ with holes in $S$ instead of $H$.
+\item Take the identity renaming in $\Gamma$, and extend it with $\theta'$ to get a renaming $\theta''$ that maps $\Gamma ++ \Delta$ to $\Delta$, with holes in $S$.
+\item Look up $m$ in $f$ to produce $t$, a term in $\Gamma ++ \Delta$ with holes in $S$.
+\item Perform capture-avoiding substitution on $t$ with the renaming $\theta''$.
+\end{itemize}
 
 \[
   t >>= (m \in H_A\Gamma \mapsto \Gamma, \Delta \vdash M : A)
