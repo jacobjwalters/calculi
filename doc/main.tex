@@ -11,27 +11,62 @@
     urlcolor=black
 }
 
-% Fonts and Symbols
+% Prelude
 \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{todonotes}
+
+% Bibliography
+\usepackage[
+  style=alphabetic,
+  sorting=ynt
+]{biblatex}
+\addbibresource{refs.bib}
 
 % Relevant packages
 \usepackage{simplebnf}
 \usepackage{semantic}
 
-% Local definitions
-\newcommand{\Base}[0]{\mathsf{Base}}
-\newcommand{\Type}[0]{\mathsf{Type}}
+% General newcommands
+\newcommand{\jtodo}[1]{\todo[inline,color=blue!40]{JW: #1}}
 
+% Inference rule definitions
 \newcommand{\Intro}[1]{#1-\textrm{I}}
 \newcommand{\Elim}[1]{#1-\textrm{E}}
 \newcommand{\Conv}[2]{#1 \leadsto #2}
 
+% Judgement definitions
+\newcommand{\ctx}[1]{#1 \textrm{ ctx}}
+\newcommand{\type}[1]{#1 \textrm{ type}}
+
+% Relation definitions
+\newcommand{\twin}[2]{#1 \frown #2}
+
+% Type definitions
+\newcommand{\Base}[0]{\mathsf{Base}}
+\newcommand{\Type}[0]{\mathsf{Type}}
+
+\newcommand{\Singleton}[2]{\textsf{Singleton}_{#1}(#2)}
+\newcommand{\val}[1]{\textrm{val } #1}
+
+\newcommand{\Bool}[0]{\textsf{Bool}}
+\newcommand{\true}[0]{\textrm{true}}
+\newcommand{\false}[0]{\textrm{false}}
+\newcommand{\ite}[3]{\textrm{if } #1 \textrm{ then } #2 \textrm{ else } #3}
+
+
 % Content
 \begin{document}
 \tableofcontents
+\todotoc\listoftodos
 \chapter{STLC}
 
 \include{sections/stlc/base}
 \newpage\include{sections/stlc/type-level-metavars}
 \newpage\include{sections/stlc/term-level-metavars}
+
+\chapter{Dependent Types}
+\include{sections/dependent/base}
+
+\printbibliography
+
 \end{document}

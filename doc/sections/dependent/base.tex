@@ -1,0 +1,166 @@
+\section{Base Dependent Types}
+When moving from STLC to dependent types, our judgements themselves become more complicated.
+To keep things simple, we'll only consider the simplest possible dependent type: the singleton.
+In order to make the calculus non-trivial, we'll include the booleans as a base type.
+
+\subsection{Presyntax}
+Our calculus is defined over precontexts $\Gamma$, pretypes $A$, and preterms $s, t, r$.
+
+\begin{bnf}
+$\Gamma$ ::=
+  | $\cdot$ : Empty context
+  | $\Gamma, x \colon S$ : Variable weakening
+  | $\Gamma, (x : A) \equiv t$ : Definition weakening
+;;
+$A$ ::=
+  | $\Bool$ : Booleans
+  | $\Singleton{A}{t}$ : The singleton of $t \,\colon A$
+;;
+$s, t, r$ ::=
+| $\true$ : Boolean value constructors
+| $\false$
+| $\ite{s}{t}{r}$ : Boolean eliminator
+| $\val{t}$ : Value constructor for $\Singleton{A}{t}$
+\end{bnf}
+
+
+\subsection{Judgements}
+\subsubsection{Contexts}
+Our contexts are snoclists of either variables (with associated types), or definitions (a variable paired with a term).
+We have a judgement to declare that $\Gamma$ is a valid context:
+\[
+  \vdash \ctx{\Gamma}
+\]
+\jtodo{Are our contexts still snoclists?}
+
+All empty contexts are valid:
+\[
+  \inference[Ctx-Emp]{}{\vdash \ctx{\cdot}}
+\]
+
+Given a valid context $\Gamma$, we can extend it with a variable:
+\[
+  \inference[Ctx-Emp]
+  {\Gamma \vdash x : A}
+  {\vdash \ctx{\Gamma, x : A}}
+\]
+
+Or, we can extend it with a definition:
+\[
+  \inference[Ctx-Emp]
+  {\Gamma \vdash t : A}
+  {\vdash \ctx{\Gamma, (x : A) \equiv t}}
+\]
+
+\jtodo{Do we need to deal with shadowing at all since we're introducing definitions into our contexts?}
+
+\subsubsection{Types}
+$A$ is a valid type in context $\Gamma$:
+\[
+  \Gamma \vdash \type{A}
+\]
+
+\subsubsection{Terms}
+$t$ is a well typed term of type $A$ in context $\Gamma$:
+\[
+  \Gamma \vdash t : A
+\]
+
+\subsection{Relations}
+We have three relations that we need to worry about, acting on contexts, types, and terms. We'll call them twinning, convertibility, and judgemental equality respectively.
+
+\subsubsection{Twinning}
+Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic} allow us to ``twin'' the same variable appearing in two terms with two different types.
+\[
+  \inference[Twin-Emp]{}{\cdot \frown \cdot}
+\]
+\[
+  \inference[Twin-Ext]
+    { \Gamma \frown \Delta
+    & \Gamma \vdash A \equiv B \dashv \Delta
+    }
+    { \Gamma, x : A \frown \Delta, y : B }
+\]
+
+The twinning relation between contexts $\Gamma$ and $\Delta$ effectively allows us to ensure that each variable in $\Gamma$ has the same shape (up to convertibility) as the corresponding variable (i.e. the variable at the same position) in $\Delta$.
+
+\subsubsection{Convertibility}
+Given two types $A$ and $B$, we define convertibility on $A$ and $B$ (writ $\Gamma \vdash A \equiv B \dashv \Delta$) inductively. Assume $\Gamma \frown \Delta$.
+
+\[
+\inference[Conv-Bool]{}{\Gamma \vdash \Bool \equiv \Bool \dashv \Gamma}
+\]
+(and the same for any other base type)
+
+For the singleton type:
+\[
+\inference[Conv-Singleton]
+    { \Gamma \vdash A \equiv B \dashv \Delta
+    & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
+    }
+    { \Gamma \vdash \Singleton{A}{t} \equiv \Singleton{B}{s} \dashv \Delta }
+\]
+
+Roughly speaking (for intution), two types are convertible up to evaluation, e.g. $(\lambda x. x) A \equiv A$.
+
+\subsubsection{Judgemental Equality}
+Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we define judgemental equality between $x$ and $y$ inductively.
+
+
+
+\[
+  \inference[JE]
+  { \twin{\Gamma}{\Delta}
+  & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
+  }
+  {\twin{\Gamma, (x : A) \equiv t}{\Delta, (y : B) \equiv s}}
+\]
+
+\jtodo{Is $x$ here a term, or just a variable name? Based on Justus' notes, it would seem to be the latter.}
+
+\subsection{Type System}
+\begin{figure*}[h]
+  \[
+    \inference[Emp]{}
+                    {\cdot \vdash}
+    \quad
+    \inference[Ext]{\Gamma \vdash & \Gamma \vdash S}
+                     {\Gamma, x : S \vdash}
+  \]
+
+  \caption*{Context Rules}
+  \label{fig:base-dt-kinding}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[\Bool]{}
+                    {\vdash \Bool : \Type}
+  \]
+  \[
+    \inference[Singleton]{\Gamma \vdash t : A & \Gamma \vdash s : B & \Gamma \vdash A \equiv B \dashv \Delta & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
+                     {\Gamma \vdash \val{t} : \Singleton{B}{s}}
+  \]
+
+  \caption*{Typing Rules}
+  \label{fig:base-dt-kinding}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[Var]{x : \tau \in \Gamma}
+                   {\Gamma \vdash x : \tau}
+    \quad
+    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
+                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
+  \]
+  \[
+    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
+                            {\Gamma \vdash f x : \tau}
+  \]
+
+  \caption*{Typing Rules}
+  \label{fig:base-dt-typing}
+\end{figure*}
+
+Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
