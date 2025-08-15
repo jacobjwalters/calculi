@@ -31,7 +31,6 @@ We have a judgement to declare that $\Gamma$ is a valid context:
 \[
   \vdash \ctx{\Gamma}
 \]
-\jtodo{Are our contexts still snoclists?}
 
 All empty contexts are valid:
 \[
@@ -51,8 +50,12 @@ Or, we can extend it with a definition:
   {\Gamma \vdash t : A}
   {\vdash \ctx{\Gamma, (x : A) \equiv t}}
 \]
+$x$ in this rule is just a name that refers to the term $t$.
+We can envision this as a let binding.
+We can think of our variables as de-Bruijn indexed, so shadowing isn't an issue.
 
-\jtodo{Do we need to deal with shadowing at all since we're introducing definitions into our contexts?}
+For implementation, we consider the support of a context (i.e., the names of the variables used by said context).
+It's too much work to index our terms by their contexts, since we have to keep track of dependencies, so instead we index terms by their support.
 
 \subsubsection{Types}
 $A$ is a valid type in context $\Gamma$:
@@ -106,8 +109,6 @@ Roughly speaking (for intution), two types are convertible up to evaluation, e.g
 \subsubsection{Judgemental Equality}
 Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we define judgemental equality between $x$ and $y$ inductively.
 
-
-
 \[
   \inference[JE]
   { \twin{\Gamma}{\Delta}
@@ -115,8 +116,6 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   }
   {\twin{\Gamma, (x : A) \equiv t}{\Delta, (y : B) \equiv s}}
 \]
-
-\jtodo{Is $x$ here a term, or just a variable name? Based on Justus' notes, it would seem to be the latter.}
 
 \subsection{Type System}
 \begin{figure*}[h]
@@ -129,7 +128,7 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \]
 
   \caption*{Context Rules}
-  \label{fig:base-dt-kinding}
+  \label{fig:base-dt-context}
 \end{figure*}
 
 \begin{figure*}[h]
@@ -143,24 +142,5 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \]
 
   \caption*{Typing Rules}
-  \label{fig:base-dt-kinding}
-\end{figure*}
-
-\begin{figure*}[h]
-  \[
-    \inference[Var]{x : \tau \in \Gamma}
-                   {\Gamma \vdash x : \tau}
-    \quad
-    \inference[\Intro{$\to$}]{\Gamma, x : \tau \vdash t : \sigma}
-                             {\Gamma \vdash \lambda x : \tau. t : \tau \to \sigma}
-  \]
-  \[
-    \inference[\Elim{$\to$}]{\Gamma \vdash f : \sigma \to \tau & \Gamma \vdash x : \sigma}
-                            {\Gamma \vdash f x : \tau}
-  \]
-
-  \caption*{Typing Rules}
   \label{fig:base-dt-typing}
 \end{figure*}
-
-Contexts $\Gamma$ are (snoc)-lists of pairs of variable names $x$ and their corresponding types $\tau$.
