@@ -10,3 +10,5 @@ Currently, the following calculi have been implemented:
 - [Intrinsically scoped STLC with type metavars](https://github.com/jacobjwalters/calculi/blob/main/src/STLCScopedMTyVar.idr).
 
 You can play around with the implementations by loading the files in the `src/` directory into an Idris2 session.
+
+The notes for this project are available on the releases page. You can download the latest version by clicking [here](https://github.com/jacobjwalters/calculi/releases/download/latest/main.pdf).
