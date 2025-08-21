@@ -10,7 +10,7 @@ Our calculus is defined over precontexts $\Gamma$, pretypes $A$, and preterms $s
 $\Gamma$ ::=
   | $\cdot$ : Empty context
   | $\Gamma, x \colon S$ : Variable weakening
-  | $\Gamma, (x : A) \equiv t$ : Definition weakening
+  | $\Gamma, (x \colon A) \equiv t$ : Definition weakening
 ;;
 $A$ ::=
   | $\Bool$ : Booleans
@@ -75,14 +75,22 @@ We have three relations that we need to worry about, acting on contexts, types, 
 \subsubsection{Twinning}
 Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic} allow us to ``twin'' the same variable appearing in two terms with two different types.
 \[
-  \inference[Twin-Emp]{}{\cdot \frown \cdot}
+  \inference[TwinEmp]{}{\cdot \frown \cdot}
 \]
 \[
-  \inference[Twin-Ext]
+  \inference[TwinExtVar]
     { \Gamma \frown \Delta
     & \Gamma \vdash A \equiv B \dashv \Delta
     }
     { \Gamma, x : A \frown \Delta, y : B }
+\]
+
+\[
+  \inference[TwinExtLet]
+  { \twin{\Gamma}{\Delta}
+  & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
+  }
+  {\twin{\Gamma, (x : A) \equiv t}{\Delta, (y : B) \equiv s}}
 \]
 
 The twinning relation between contexts $\Gamma$ and $\Delta$ effectively allows us to ensure that each variable in $\Gamma$ has the same shape (up to convertibility) as the corresponding variable (i.e. the variable at the same position) in $\Delta$.
@@ -107,15 +115,47 @@ For the singleton type:
 Roughly speaking (for intution), two types are convertible up to evaluation, e.g. $(\lambda x. x) A \equiv A$.
 
 \subsubsection{Judgemental Equality}
-Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we define judgemental equality between $x$ and $y$ inductively.
+Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we define judgemental equality between $x$ and $y$ as a congruent equality relation, with beta and eta rules for Singletons.
 
-\[
-  \inference[JE]
-  { \twin{\Gamma}{\Delta}
-  & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
-  }
-  {\twin{\Gamma, (x : A) \equiv t}{\Delta, (y : B) \equiv s}}
-\]
+\begin{figure*}[h]
+  \[
+    \inference[JE-Refl]{\Gamma \vdash t : A}
+                    {\Gamma \vdash (t : A) \equiv (t : A)}
+    \quad
+    \inference[JE-Sym]{\Gamma \vdash (t : A) \equiv (t' : A)}
+                     {\Gamma \vdash (t' : A) \equiv (t : A)}
+  \]
+
+  \[
+    \inference[JE-Trans]{\Gamma \vdash (t : A) \equiv (s : A) & \Gamma \vdash (s : A) \equiv (r : A)}
+                     {\Gamma \vdash (t : A) \equiv (r : A)}
+  \]
+
+  \[
+    \inference[JE-Cong]{\Gamma \vdash A \equiv B & \Gamma \vdash (t : A) \equiv (s : B)}
+                     {\Gamma \vdash (t : A) \equiv (s : B)}
+  \]
+
+  \caption*{Judgemental Equality Rules}
+  \label{fig:base-dt-je-rules}
+\end{figure*}
+
+\jtodo{Congruence?}
+
+\begin{figure*}[h]
+  \[
+    \inference[Singleton-$\beta$]{}
+                    {}
+    \quad
+    \inference[Singleton-$\eta$]{}
+                     {}
+  \]
+  \jtodo{What should these look like? Also, what is the eliminator for Singletons?}
+
+  \caption*{Singleton Beta/Eta}
+  \label{fig:base-dt-singleton-beta-eta}
+\end{figure*}
+
 
 \subsection{Type System}
 \begin{figure*}[h]
@@ -123,7 +163,7 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
     \inference[Emp]{}
                     {\cdot \vdash}
     \quad
-    \inference[Ext]{\Gamma \vdash & \Gamma \vdash S}
+    \inference[Ext]{\Gamma \vdash & \Gamma \vdash \type{S}}
                      {\Gamma, x : S \vdash}
   \]
 
