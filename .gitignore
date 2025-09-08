@@ -8,4 +8,10 @@ build/
 *.out
 *.pdf
 *.toc
+*.bbl*
+*.bcf*
+*.blg
+*.dvi
+*.run.xml
+*.tdo
 .DS_Store
