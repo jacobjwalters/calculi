@@ -1,5 +1,5 @@
 ||| Intrinsically scoped dependently typed lambda calculus.
-module STLC.DependentlyTyped.Core
+module DTs.Singleton.Core
 
 import Data.List
 import Data.SnocList
