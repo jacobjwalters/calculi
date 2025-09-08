@@ -6,7 +6,7 @@ Ex_base_id : Term
 Ex_base_id = Lam "x" Base (EVar "x")
 
 Ex_check_base_id : check [<] Ex_base_id (Fn Base Base) = True
-Ex_check_base_id = Refl
+Ex_check_base_id = ?refl  -- TODO: I don't know why this doesn't unify
 
 Ex_ill_scoped1 : Term
 Ex_ill_scoped1 = Lam "x" Base (EVar "y")

@@ -1,5 +1,5 @@
-module STLC.Basic where
+module STLC.Basic
 
-public import STLC.Basic.Core
-public import STLC.Basic.Parser
-public import STLC.Basic.Examples
+import STLC.Basic.Core
+import STLC.Basic.Parser
+import STLC.Basic.Examples
