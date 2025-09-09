@@ -34,19 +34,19 @@ We have a judgement to declare that $\Gamma$ is a valid context:
 
 All empty contexts are valid:
 \[
-  \inference[Ctx-Emp]{}{\vdash \ctx{\cdot}}
+  \inference[CtxEmp]{}{\vdash \ctx{\cdot}}
 \]
 
 Given a valid context $\Gamma$, we can extend it with a variable:
 \[
-  \inference[Ctx-Emp]
+  \inference[CtxExtVar]
   {\Gamma \vdash x : A}
   {\vdash \ctx{\Gamma, x : A}}
 \]
 
 Or, we can extend it with a definition:
 \[
-  \inference[Ctx-Emp]
+  \inference[CtxExtLet]
   {\Gamma \vdash t : A}
   {\vdash \ctx{\Gamma, (x : A) \equiv t}}
 \]
