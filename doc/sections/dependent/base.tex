@@ -34,19 +34,19 @@ We have a judgement to declare that $\Gamma$ is a valid context:
 
 All empty contexts are valid:
 \[
-  \inference[CtxEmp]{}{\vdash \ctx{\cdot}}
+  \inference[Ctx-Emp]{}{\vdash \ctx{\cdot}}
 \]
 
 Given a valid context $\Gamma$, we can extend it with a variable:
 \[
-  \inference[CtxExtVar]
+  \inference[Ctx-ExtVar]
   {\Gamma \vdash x : A}
   {\vdash \ctx{\Gamma, x : A}}
 \]
 
 Or, we can extend it with a definition:
 \[
-  \inference[CtxExtLet]
+  \inference[Ctx-ExtLet]
   {\Gamma \vdash t : A}
   {\vdash \ctx{\Gamma, (x : A) \equiv t}}
 \]
@@ -75,10 +75,10 @@ We have three relations that we need to worry about, acting on contexts, types, 
 \subsubsection{Twinning}
 Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic} allow us to ``twin'' the same variable appearing in two terms with two different types.
 \[
-  \inference[TwinEmp]{}{\cdot \frown \cdot}
+  \inference[Twin-Emp]{}{\cdot \frown \cdot}
 \]
 \[
-  \inference[TwinExtVar]
+  \inference[Twin-ExtVar]
     { \Gamma \frown \Delta
     & \Gamma \vdash A \equiv B \dashv \Delta
     }
@@ -86,7 +86,7 @@ Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013Tu
 \]
 
 \[
-  \inference[TwinExtLet]
+  \inference[Twin-ExtLet]
   { \twin{\Gamma}{\Delta}
   & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
   }
