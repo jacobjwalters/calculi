@@ -143,20 +143,6 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
 \jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
 \jtodo{Congruence?}
 
-\begin{figure*}[h]
-  \[
-    \inference[Singleton-$\beta$]{}
-                    {}
-    \quad
-    \inference[Singleton-$\eta$]{}
-                     {}
-  \]
-
-  \caption*{Singleton Beta/Eta}
-  \label{fig:base-dt-singleton-beta-eta}
-\end{figure*}
-
-
 \subsection{Type System}
 \begin{figure*}[h]
   \[
@@ -183,4 +169,28 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
 
   \caption*{Typing Rules}
   \label{fig:base-dt-typing}
+\end{figure*}
+
+\subsection{Equational System}
+
+We don't define an $\eta$ rule for $\Singleton{}{}$, as it would require introducing many more features to our calculus than we care about.
+
+
+\begin{figure*}[h]
+  \[
+  \inference[\Intro{$\Singleton{}{}$}]
+            {\Gamma \vdash t : A}
+            {\Gamma \vdash \val{A}{t} : \Singleton{A}{t}}
+  \]
+
+  \[
+  \inference[\Elim{$\Singleton{}{}$}]
+            {\Gamma \vdash t : \Singleton{A}{t}
+            & \Gamma \vdash (t : \Singleton{A}{t}) \equiv (s : \Singleton{A}{s}) \dashv \Gamma
+            & \Gamma, (x : A) \equiv s \vdash \type{B}}
+            {\Gamma \vdash \textrm{let val } x = t \textrm{ in } r : B}
+  \]
+
+  \caption*{$\Singleton{}{}$ Intro/Elim}
+  \label{fig:base-dt-singleton-beta-eta}
 \end{figure*}
