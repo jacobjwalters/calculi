@@ -195,3 +195,18 @@ We don't define an $\eta$ rule for $\Singleton$, as it would require introducing
 
 \jtodo{Conv on bool elim for cond? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
 \jtodo{Arbitrarily picking A as a return type in elim, but should I introduce a third type and enforce conv between it, A, and B?}
+
+
+\begin{figure*}[h]
+  \[
+  \inference[$\Singleton$-$\beta$]
+            { \Gamma \vdash \letval x {\val[A][t]} x : A
+            }
+            {\Gamma \vdash t : A}
+  \]
+
+  \caption*{$\beta$ rules}
+  \label{fig:base-dt-singleton-beta-eta}
+\end{figure*}
+
+\jtodo{Beta/Eta for bools?}
