@@ -30,29 +30,38 @@
 % General newcommands
 \newcommand{\jtodo}[1]{\todo[inline,color=blue!40]{JW: #1}}
 
+% Typeface defs
+\newcommand\jg\textbf
+\newcommand\ty\textsf
+\newcommand\tm\textrm
+
 % Inference rule definitions
 \newcommand{\Intro}[1]{#1-\textrm{I}}
 \newcommand{\Elim}[1]{#1-\textrm{E}}
 \newcommand{\Conv}[2]{#1 \leadsto #2}
 
 % Judgement definitions
-\newcommand{\ctx}[1]{#1 \textrm{ ctx}}
-\newcommand{\type}[1]{#1 \textrm{ type}}
+\newcommand{\ctx}[1]{#1 \jg{ ctx}}
+\newcommand{\type}[1]{#1 \jg{ type}}
 
 % Relation definitions
 \newcommand{\twin}[2]{#1 \frown #2}
 
 % Type definitions
-\newcommand{\Base}[0]{\mathsf{Base}}
-\newcommand{\Type}[0]{\mathsf{Type}}
+\newcommand{\Base}[0]{\ty{Base}}
+\newcommand{\Type}[0]{\ty{Type}}
 
-\newcommand{\Singleton}[2]{\textsf{Singleton}_{#1}(#2)}
-\newcommand{\val}[1]{\textrm{val } #1}
+% TODO: newcommands that don't take arguments, so we can name constructors without the extra syntax for their subterms
+%\newcommand{\Singleton}[2]{\textsf{Singleton}_{#1}(#2)}
+%\newcommand{\val}[1]{\textrm{val } #1}
+\NewDocumentCommand{\Singleton}{o o}{\ty{Singleton}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
+\NewDocumentCommand{\val}{o o}{\textrm{val}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
+\newcommand{\letval}[3]{\tm{let val } #1 = #2 \tm{ in } #3}
 
-\newcommand{\Bool}[0]{\textsf{Bool}}
-\newcommand{\true}[0]{\textrm{true}}
-\newcommand{\false}[0]{\textrm{false}}
-\newcommand{\ite}[3]{\textrm{if } #1 \textrm{ then } #2 \textrm{ else } #3}
+\newcommand{\Bool}[0]{\ty{Bool}}
+\newcommand{\true}[0]{\tm{true}}
+\newcommand{\false}[0]{\tm{false}}
+\newcommand{\ite}[3]{\tm{if } #1 \tm{ then } #2 \tm{ else } #3}
 
 
 % Content

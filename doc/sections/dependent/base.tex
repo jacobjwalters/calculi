@@ -14,13 +14,13 @@ $\Gamma$ ::=
 ;;
 $A$ ::=
   | $\Bool$ : Booleans
-  | $\Singleton{A}{t}$ : The singleton of $t \,\colon A$
+  | $\Singleton[A][t]$ : The singleton of $t \,\colon A$
 ;;
 $s, t, r$ ::=
 | $\true$ : Boolean value constructors
 | $\false$
 | $\ite{s}{t}{r}$ : Boolean eliminator
-| $\val{t}$ : Value constructor for $\Singleton{A}{t}$
+| $\val[A][t]$ : Value constructor for $\Singleton[A][t]$
 \end{bnf}
 
 
@@ -105,11 +105,11 @@ Given two types $A$ and $B$, we define convertibility on $A$ and $B$ (writ $\Gam
 
 For the singleton type:
 \[
-\inference[Conv-Singleton]
+\inference[Conv-$\Singleton$]
     { \Gamma \vdash A \equiv B \dashv \Delta
     & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
     }
-    { \Gamma \vdash \Singleton{A}{t} \equiv \Singleton{B}{s} \dashv \Delta }
+    { \Gamma \vdash \Singleton[A][t] \equiv \Singleton[A][t] \dashv \Delta }
 \]
 
 Roughly speaking (for intution), two types are convertible up to evaluation, e.g. $(\lambda x. x) A \equiv A$.
@@ -143,54 +143,55 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
 \jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
 \jtodo{Congruence?}
 
-\subsection{Type System}
-\begin{figure*}[h]
-  \[
-    \inference[Emp]{}
-                    {\cdot \vdash}
-    \quad
-    \inference[Ext]{\Gamma \vdash & \Gamma \vdash \type{S}}
-                     {\Gamma, x : S \vdash}
-  \]
-
-  \caption*{Context Rules}
-  \label{fig:base-dt-context}
-\end{figure*}
-
-\begin{figure*}[h]
-  \[
-    \inference[\Bool]{}
-                    {\vdash \Bool : \Type}
-  \]
-  \[
-    \inference[Singleton]{\Gamma \vdash t : A & \Gamma \vdash s : B & \Gamma \vdash A \equiv B \dashv \Delta & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
-                     {\Gamma \vdash \val{t} : \Singleton{B}{s}}
-  \]
-
-  \caption*{Typing Rules}
-  \label{fig:base-dt-typing}
-\end{figure*}
-
 \subsection{Equational System}
 
-We don't define an $\eta$ rule for $\Singleton{}{}$, as it would require introducing many more features to our calculus than we care about.
-
+We don't define an $\eta$ rule for $\Singleton$, as it would require introducing many more features to our calculus than we care about.
 
 \begin{figure*}[h]
   \[
-  \inference[\Intro{$\Singleton{}{}$}]
-            {\Gamma \vdash t : A}
-            {\Gamma \vdash \val{A}{t} : \Singleton{A}{t}}
+  \inference[\Intro{$\Singleton$}]
+            { \Gamma \vdash t : A
+            & \Gamma \vdash s : B
+            & \Gamma \vdash A \equiv B \dashv \Delta
+            & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
+            }
+            {\Gamma \vdash \val[][t] : \Singleton[B][s]}
   \]
 
   \[
-  \inference[\Elim{$\Singleton{}{}$}]
-            {\Gamma \vdash t : \Singleton{A}{t}
-            & \Gamma \vdash (t : \Singleton{A}{t}) \equiv (s : \Singleton{A}{s}) \dashv \Gamma
-            & \Gamma, (x : A) \equiv s \vdash \type{B}}
-            {\Gamma \vdash \textrm{let val } x = t \textrm{ in } r : B}
+  \inference[\Elim{$\Singleton$}]
+            {\Gamma \vdash t : \Singleton[A][t]
+            & \Gamma \vdash (t : \Singleton[A][t]) \equiv (s : \Singleton[A][s]) \dashv \Gamma
+            & \Gamma, (x : A) \equiv s \vdash \type B}
+            {\Gamma \vdash \letval x t r : B}
   \]
 
-  \caption*{$\Singleton{}{}$ Intro/Elim}
+  \caption*{$\Singleton$ Intro/Elim}
   \label{fig:base-dt-singleton-beta-eta}
 \end{figure*}
+
+\begin{figure*}[h]
+  \[
+  \inference[\Intro{$\Bool$}$_{\true}$]{}
+            {\Gamma \vdash \true : \Bool}
+  \quad
+  \inference[\Intro{$\Bool$}$_{\false}$]{}
+            {\Gamma \vdash \false : \Bool}
+  \]
+
+  \[
+  \inference[\Elim{$\Bool$}]
+            {\Gamma \vdash c : \Bool
+            & t : A
+            & e : B
+            & \Gamma \vdash A \equiv B \dashv \Delta
+            }
+            {\Gamma \vdash \ite c t e : A}
+  \]
+
+  \caption*{$\Bool$ Intro/Elim}
+  \label{fig:base-dt-singleton-beta-eta}
+\end{figure*}
+
+\jtodo{Conv on bool elim for cond? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
+\jtodo{Arbitrarily picking A as a return type in elim, but should I introduce a third type and enforce conv between it, A, and B?}
