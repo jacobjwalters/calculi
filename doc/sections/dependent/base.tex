@@ -120,19 +120,19 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
 \begin{figure*}[h]
   \[
     \inference[JE-Refl]{\Gamma \vdash t : A}
-                    {\Gamma \vdash (t : A) \equiv (t : A)}
+                    {\Gamma \vdash (t : A) \equiv (t : A) \dashv \Gamma}
     \quad
-    \inference[JE-Sym]{\Gamma \vdash (t : A) \equiv (t' : A)}
-                     {\Gamma \vdash (t' : A) \equiv (t : A)}
+    \inference[JE-Sym]{\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
+                     {\Delta \vdash (s : B) \equiv (t : A) \dashv \Gamma}
   \]
 
   \[
-    \inference[JE-Trans]{\Gamma \vdash (t : A) \equiv (s : A) & \Gamma \vdash (s : A) \equiv (r : A)}
-                     {\Gamma \vdash (t : A) \equiv (r : A)}
+    \inference[JE-Trans]{\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta & \Delta \vdash (s : B) \equiv (r : C) \dashv \Xi}
+                     {\Gamma \vdash (t : A) \equiv (r : C) \dashv \Xi}
   \]
 
   \[
-    \inference[JE-Cong]{\Gamma \vdash A \equiv B & \Gamma \vdash (t : A) \equiv (s : B)}
+    \inference[JE-Cong]{\Gamma \vdash A \equiv B \dashv \Delta & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
                      {\Gamma \vdash (t : A) \equiv (s : B)}
   \]
 
@@ -140,6 +140,7 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \label{fig:base-dt-je-rules}
 \end{figure*}
 
+\jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
 \jtodo{Congruence?}
 
 \begin{figure*}[h]
@@ -150,7 +151,6 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
     \inference[Singleton-$\eta$]{}
                      {}
   \]
-  \jtodo{What should these look like? Also, what is the eliminator for Singletons?}
 
   \caption*{Singleton Beta/Eta}
   \label{fig:base-dt-singleton-beta-eta}
