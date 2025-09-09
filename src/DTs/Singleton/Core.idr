@@ -62,3 +62,10 @@ data Conv : Precontext xs -> Pretype xs -> Precontext ys -> Pretype ys -> Type w
 data JE : Precontext xs -> Preterm xs -> Pretype xs
        -> Precontext ys -> Preterm ys -> Pretype ys
        -> Type where
+  JERefl : (gamma : Precontext vs) -> (t : Preterm vs) -> (a : Pretype vs)
+        -> JE gamma t a gamma t a
+  JESym : JE gamma t  a delta s b
+       -> JE delta s b gamma t a
+  JETrans : JE gamma t a delta s b
+         -> JE delta s b xi    r c
+         -> JE gamma t a xi    r c
