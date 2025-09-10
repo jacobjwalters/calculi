@@ -137,7 +137,7 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \]
 
   \caption*{Judgemental Equality Rules}
-  \label{fig:base-dt-je-rules}
+  \label{fig:dt-singletons-je-rules}
 \end{figure*}
 
 \jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
@@ -166,7 +166,7 @@ We define constructors and eliminators for our types.
   \]
 
   \caption*{$\Singleton$ Intro/Elim}
-  \label{fig:base-dt-singleton-intro-elim}
+  \label{fig:dt-singletons-singleton-intro-elim}
 \end{figure*}
 
 \begin{figure*}[h]
@@ -189,7 +189,7 @@ We define constructors and eliminators for our types.
   \]
 
   \caption*{$\Bool$ Intro/Elim}
-  \label{fig:base-dt-bool-intro-elim}
+  \label{fig:dt-singletons-bool-intro-elim}
 \end{figure*}
 
 \jtodo{Conv on bool-elim for cond (i.e. $c : C$, $C \equiv \Bool$)? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
@@ -210,7 +210,7 @@ We define constructors and eliminators for our types.
   \end{equation}
 
   \caption*{$\beta$ rules}
-  \label{fig:base-dt-beta}
+  \label{fig:dt-singletons-beta}
 \end{figure*}
 
 \jtodo{What does beta for bools look like?}
@@ -222,7 +222,7 @@ We define constructors and eliminators for our types.
   \end{equation}
 
   \caption*{$\eta$ rules}
-  \label{fig:base-dt-eta}
+  \label{fig:dt-singletons-eta}
 \end{figure*}
 
 We don't define an $\eta$ rule for $\Singleton$, as it would require introducing many more features to our calculus than we care about.
