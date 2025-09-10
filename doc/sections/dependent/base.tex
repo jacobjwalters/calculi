@@ -141,11 +141,10 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
 \end{figure*}
 
 \jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
-\jtodo{Congruence?}
+\jtodo{What does the congruence rule look like?}
 
 \subsection{Equational System}
-
-We don't define an $\eta$ rule for $\Singleton$, as it would require introducing many more features to our calculus than we care about.
+We define constructors and eliminators for our types.
 
 \begin{figure*}[h]
   \[
@@ -193,8 +192,8 @@ We don't define an $\eta$ rule for $\Singleton$, as it would require introducing
   \label{fig:base-dt-singleton-beta-eta}
 \end{figure*}
 
-\jtodo{Conv on bool elim for cond? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
-\jtodo{Arbitrarily picking A as a return type in elim, but should I introduce a third type and enforce conv between it, A, and B?}
+\jtodo{Conv on bool-elim for cond (i.e. $c : C$, $C \equiv \Bool$)? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
+\jtodo{Arbitrarily picking A as a return type in bool-elim, but should I introduce a third type and enforce conv between it, A, and B?}
 
 
 \begin{figure*}[h]
@@ -205,8 +204,25 @@ We don't define an $\eta$ rule for $\Singleton$, as it would require introducing
             {\Gamma \vdash t : A}
   \]
 
+  \begin{equation}
+    \tag{$\Singleton$-$\beta$}
+    \letval x {\val[A][t]} x \equiv t
+  \end{equation}
+
   \caption*{$\beta$ rules}
   \label{fig:base-dt-singleton-beta-eta}
 \end{figure*}
 
-\jtodo{Beta/Eta for bools?}
+\jtodo{What does beta for bools look like?}
+
+\begin{figure*}[h]
+  \begin{equation}
+    \tag{$\Bool$-$\eta$}
+    \ite c \true \false \equiv c
+  \end{equation}
+
+  \caption*{$\eta$ rules}
+  \label{fig:base-dt-singleton-beta-eta}
+\end{figure*}
+
+We don't define an $\eta$ rule for $\Singleton$, as it would require introducing many more features to our calculus than we care about.
