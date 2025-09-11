@@ -55,7 +55,7 @@ We can envision this as a let binding.
 We can think of our variables as de-Bruijn indexed, so shadowing isn't an issue.
 
 For implementation, we consider the support of a context (i.e., the names of the variables used by said context).
-It's too much work to index our terms by their contexts, since we have to keep track of dependencies, so instead we index terms by their support.
+It's too much work (as in, an open problem) to index our terms by their contexts, since we have to keep track of dependencies, so instead we index terms by their support.
 
 \subsubsection{Types}
 $A$ is a valid type in context $\Gamma$:
@@ -73,7 +73,10 @@ $t$ is a well typed term of type $A$ in context $\Gamma$:
 We have three relations that we need to worry about, acting on contexts, types, and terms. We'll call them twinning, convertibility, and judgemental equality respectively.
 
 \subsubsection{Twinning}
-Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic} allow us to ``twin'' the same variable appearing in two terms with two different types.
+Introduced by Gundry \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic}, a twinning relation (writ $\twin \Gamma \Delta$) allows us to ``twin'' the same variable appearing in two terms under different contexts with the same shape, where ``shape'' is defined via convertibility on types.
+
+The twinning relation between contexts $\Gamma$ and $\Delta$ defines a bijective correspondence between $\Gamma$'s support and $\Delta$'s support, and ensures that corresponding variables in $\Gamma$ and $\Delta$ have the same shape, up to convertibility.
+
 \[
   \inference[Twin-Emp]{}{\cdot \frown \cdot}
 \]
@@ -93,19 +96,18 @@ Gundry's twin variables \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013Tu
   {\twin{\Gamma, (x : A) \equiv t}{\Delta, (y : B) \equiv s}}
 \]
 
-The twinning relation between contexts $\Gamma$ and $\Delta$ effectively allows us to ensure that each variable in $\Gamma$ has the same shape (up to convertibility) as the corresponding variable (i.e. the variable at the same position) in $\Delta$.
 
 \subsubsection{Convertibility}
 Given two types $A$ and $B$, we define convertibility on $A$ and $B$ (writ $\Gamma \vdash A \equiv B \dashv \Delta$) inductively. Assume $\Gamma \frown \Delta$.
 
 \[
-\inference[Conv-Bool]{}{\Gamma \vdash \Bool \equiv \Bool \dashv \Gamma}
+\inference[Conv-\Bool-Cong]{}{\Gamma \vdash \Bool \equiv \Bool \dashv \Gamma}
 \]
-(and the same for any other base type)
+(we postulate the same for any other closed type)
 
 For the singleton type:
 \[
-\inference[Conv-$\Singleton$]
+\inference[Conv-$\Singleton$-Cong]
     { \Gamma \vdash A \equiv B \dashv \Delta
     & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
     }
@@ -131,17 +133,14 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
                      {\Gamma \vdash (t : A) \equiv (r : C) \dashv \Xi}
   \]
 
-  \[
-    \inference[JE-Cong]{\Gamma \vdash A \equiv B \dashv \Delta & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
-                     {\Gamma \vdash (t : A) \equiv (s : B)}
-  \]
-
   \caption*{Judgemental Equality Rules}
   \label{fig:dt-singletons-je-rules}
 \end{figure*}
 
-\jtodo{Should we force $A$ on both sides in JE-Sym or force convertibility?}
-\jtodo{What does the congruence rule look like?}
+\jq{Should we force $A$ on both sides in JE-Sym or force convertibility?}
+\jq{What does the congruence rule look like?}
+
+% TODO: define congruence rules for each term and type constructor
 
 \subsection{Equational System}
 We define constructors and eliminators for our types.
@@ -151,7 +150,6 @@ We define constructors and eliminators for our types.
   \inference[\Intro{$\Singleton$}]
             { \Gamma \vdash t : A
             & \Gamma \vdash s : B
-            & \Gamma \vdash A \equiv B \dashv \Delta
             & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
             }
             {\Gamma \vdash \val[][t] : \Singleton[B][s]}
@@ -159,9 +157,8 @@ We define constructors and eliminators for our types.
 
   \[
   \inference[\Elim{$\Singleton$}]
-            {\Gamma \vdash t : \Singleton[A][t]
-            & \Gamma \vdash (t : \Singleton[A][t]) \equiv (s : \Singleton[A][s]) \dashv \Gamma
-            & \Gamma, (x : A) \equiv s \vdash \type B}
+            {\Gamma \vdash t : \Singleton[A][s]
+            & \Gamma, (x : A) \equiv s \vdash r : B}
             {\Gamma \vdash \letval x t r : B}
   \]
 
@@ -209,11 +206,19 @@ We define constructors and eliminators for our types.
     \letval x {\val[A][t]} x \equiv t
   \end{equation}
 
+  \begin{equation}
+    \tag{$\Bool$-$\beta$_1}
+    \ite \true t e \equiv t
+  \end{equation}
+
+  \begin{equation}
+    \tag{$\Bool$-$\beta$_2}
+    \ite \false t e \equiv e
+  \end{equation}
+
   \caption*{$\beta$ rules}
   \label{fig:dt-singletons-beta}
 \end{figure*}
-
-\jtodo{What does beta for bools look like?}
 
 \begin{figure*}[h]
   \begin{equation}
