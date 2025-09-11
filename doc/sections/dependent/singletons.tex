@@ -133,8 +133,35 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
                      {\Gamma \vdash (t : A) \equiv (r : C) \dashv \Xi}
   \]
 
-  \caption*{Judgemental Equality Rules}
-  \label{fig:dt-singletons-je-rules}
+  \caption*{Judgemental Equality Equivalence Relation Laws}
+  \label{fig:dt-singletons-je-er}
+\end{figure*}
+
+\begin{figure*}[h]
+  \[
+    \inference[JE-\true-Cong]{}
+                    {\Gamma \vdash (\true : \Bool) \equiv (\true : \Bool) \dashv \Delta}
+    \quad
+    \inference[JE-\false-Cong]{}
+                    {\Gamma \vdash (\false : \Bool) \equiv (\false : \Bool) \dashv \Delta}
+  \]
+
+  \[
+  \inference[JE-ITE-Cong]
+            { \Gamma \vdash (c : \Bool) \equiv (c' : \Bool) \dashv \Delta
+            & \Gamma \vdash (t : A) \equiv (t' : A') \dashv \Delta
+            & \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
+            }
+            {\Gamma \vdash (\ite c t e : A) \equiv (\ite{c'}{t'}{e'} : A') \dashv \Delta}
+  \]
+
+  \[
+    \inference[JE-\Singleton-Cong]{\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
+                     {\Gamma \vdash (\val[A][t] : \Singleton[A][t]) \equiv (\val[B][s] : \Singleton[B][s]) \dashv \Delta}
+  \]
+
+  \caption*{Judgemental Equality Congruences}
+  \label{fig:dt-singletons-je-cong}
 \end{figure*}
 
 \jq{Should we force $A$ on both sides in JE-Sym or force convertibility?}
