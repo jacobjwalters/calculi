@@ -51,9 +51,6 @@
 \newcommand{\Base}[0]{\ty{Base}}
 \newcommand{\Type}[0]{\ty{Type}}
 
-% TODO: newcommands that don't take arguments, so we can name constructors without the extra syntax for their subterms
-%\newcommand{\Singleton}[2]{\textsf{Singleton}_{#1}(#2)}
-%\newcommand{\val}[1]{\textrm{val } #1}
 \NewDocumentCommand{\Singleton}{o o}{\ty{Singleton}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
 \NewDocumentCommand{\val}{o o}{\textrm{val}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
 \newcommand{\letval}[3]{\tm{let val } #1 = #2 \tm{ in } #3}
