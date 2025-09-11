@@ -53,7 +53,7 @@
 \newcommand{\Type}[0]{\ty{Type}}
 
 \NewDocumentCommand{\Singleton}{o o}{\ty{Singleton}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
-\NewDocumentCommand{\val}{o o}{\textrm{val}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
+\NewDocumentCommand{\val}{o o}{\tm{val}\IfValueT{#1}{_{#1}}\IfValueT{#2}{\,#2}}
 \newcommand{\letval}[3]{\tm{let val } #1 = #2 \tm{ in } #3}
 
 \newcommand{\Bool}[0]{\ty{Bool}}
