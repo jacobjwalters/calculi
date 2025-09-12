@@ -4,7 +4,7 @@ To keep things simple, we'll only consider the simplest possible dependent type:
 In order to make the calculus non-trivial, we'll include the booleans as a base type.
 
 \subsection{Presyntax}
-Our calculus is defined over precontexts $\Gamma$, pretypes $A$, and preterms $s, t, r$.
+Our calculus is defined over precontexts $\Gamma$, pretypes $A$, and preterms $t, c, e$.
 
 \begin{bnf}
 $\Gamma$ ::=
@@ -16,14 +16,15 @@ $A$ ::=
   | $\Bool$ : Booleans
   | $\Singleton[A][t]$ : The singleton of $t \,\colon A$
 ;;
-$s, t, r$ ::=
+$t, c, e$ ::=
 | $\true$ : Boolean value constructors
 | $\false$
-| $\ite{s}{t}{r}$ : Boolean eliminator
+| $\when{c}{x}{A}{t}{e}$ : Boolean eliminator
 | $\val[A][t]$ : Value constructor for $\Singleton[A][t]$
 | $x, y, z, ...$ : Variables
 \end{bnf}
 
+Intuition for the boolean eliminator is that it acts like if-then-else, except it also binds the value of $c$ to $x$, and makes this available for $A$ to use.
 
 \subsection{Judgements}
 \subsubsection{Contexts}
@@ -151,16 +152,18 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \]
 
   \[
-  \inference[JE-\tm{ITE}-Cong]
-            { \Gamma \vdash (c : \Bool) \equiv (c' : \Bool) \dashv \Delta
+  \inference[JE-\tm{when}-Cong]
+            { \Gamma \vdash (x : \Bool) \equiv (x' : \Bool) \dashv \Delta
+            & \Gamma \vdash (c : \Bool) \equiv (c' : \Bool) \dashv \Delta
             \\ \Gamma \vdash (t : A) \equiv (t' : A') \dashv \Delta
-            \\ \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
+            & \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
             }
-            {\Gamma \vdash (\ite c t e : A) \equiv (\ite{c'}{t'}{e'} : A') \dashv \Delta}
+            {\Gamma \vdash (\when c x A t e : A[x \mapsto c])
+            \\ \equiv (\when{c'}{x'}{A'}{t'}{e'} : A'[x' \mapsto c']) \dashv \Delta}
   \]
 
   \[
-    \inference[JE-\Singleton-Cong]{\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
+    \inference[JE-\val-Cong]{\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta}
                      {\Gamma \vdash (\val[A][t] : \Singleton[A][t]) \equiv (\val[B][s] : \Singleton[B][s]) \dashv \Delta}
   \]
 
@@ -204,11 +207,11 @@ We define constructors and eliminators for our types.
   \[
   \inference[\Elim{$\Bool$}]
             {\Gamma \vdash c : \Bool
-            & t : A
-            & e : B
             & \Gamma \vdash A \equiv B \dashv \Delta
+            \\ \Gamma, (\ford : \Singleton[\Bool][c]) \equiv \val[\Bool][\true] \vdash t : A[x \mapsto \true]
+            \\ \Gamma, (\ford : \Singleton[\Bool][c]) \equiv \val[\Bool][\false] \vdash e : A[x \mapsto \false]
             }
-            {\Gamma \vdash \ite c t e : A}
+            {\Gamma \vdash \when c x A t e : A : A[x \mapsto c]}
   \]
 
   \caption*{$\Bool$ Intro/Elim}
@@ -236,12 +239,12 @@ We define constructors and eliminators for our types.
 
   \begin{equation}
     \tag{$\Bool$-$\beta_{\true}$}
-    \ite \true t e \equiv t
+    \when \true x A t e \equiv t
   \end{equation}
 
   \begin{equation}
     \tag{$\Bool$-$\beta_{\false}2$}
-    \ite \false t e \equiv e
+    \ite \false x A t e \equiv e
   \end{equation}
 
   \caption*{$\beta$ rules}
@@ -251,13 +254,13 @@ We define constructors and eliminators for our types.
 \begin{figure*}[h]
   \begin{equation}
     \tag{$\Bool$-$\eta$}
-    \ite c \true \false \equiv c
+    \ite c x A \true \false \equiv c
   \end{equation}
 
   \[
   \inference[$\Bool$-$\eta$]
             { \Gamma \vdash c : \Bool}
-            {\Gamma \vdash \ite c \true \false : Bool}
+            {\Gamma \vdash \ite c x A \true \false : Bool}
   \]
 
   \caption*{$\eta$ rules}
