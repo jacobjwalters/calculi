@@ -21,6 +21,7 @@ $s, t, r$ ::=
 | $\false$
 | $\ite{s}{t}{r}$ : Boolean eliminator
 | $\val[A][t]$ : Value constructor for $\Singleton[A][t]$
+| $x, y, z, ...$ : Variables
 \end{bnf}
 
 
@@ -70,10 +71,10 @@ $t$ is a well typed term of type $A$ in context $\Gamma$:
 \]
 
 \subsection{Relations}
-We have three relations that we need to worry about, acting on contexts, types, and terms. We'll call them twinning, convertibility, and judgemental equality respectively.
+We have three relations that we need to worry about, acting on contexts, types, and terms. We'll call them twinning (writ $\twin \Gamma \Delta$), convertibility (writ $\Gamma \vdash A \equiv B \dashv \Delta$), and judgemental equality (writ $\Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta$) respectively.
 
 \subsubsection{Twinning}
-Introduced by Gundry \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic}, a twinning relation (writ $\twin \Gamma \Delta$) allows us to ``twin'' the same variable appearing in two terms under different contexts with the same shape, where ``shape'' is defined via convertibility on types.
+Introduced by Gundry \cite{gundry2013TypeInferenceHaskell} \cite{gundry2013TutorialImplementationDynamic}, a twinning relation allows us to ``twin'' the same variable appearing in two terms under different contexts with the same shape, where ``shape'' is defined via convertibility on types.
 
 The twinning relation between contexts $\Gamma$ and $\Delta$ defines a bijective correspondence between $\Gamma$'s support and $\Delta$'s support, and ensures that corresponding variables in $\Gamma$ and $\Delta$ have the same shape, up to convertibility.
 
@@ -98,10 +99,10 @@ The twinning relation between contexts $\Gamma$ and $\Delta$ defines a bijective
 
 
 \subsubsection{Convertibility}
-Given two types $A$ and $B$, we define convertibility on $A$ and $B$ (writ $\Gamma \vdash A \equiv B \dashv \Delta$) inductively. Assume $\Gamma \frown \Delta$.
+Given two types $A$ and $B$, we define convertibility on $A$ and $B$ inductively. Assume $\Gamma$ and $\Delta$ are twinned.
 
 \[
-\inference[Conv-\Bool-Cong]{}{\Gamma \vdash \Bool \equiv \Bool \dashv \Gamma}
+\inference[Conv-\Bool-Cong]{}{\Gamma \vdash \Bool \equiv \Bool \dashv \Delta}
 \]
 (we postulate the same for any other closed type)
 
@@ -111,8 +112,10 @@ For the singleton type:
     { \Gamma \vdash A \equiv B \dashv \Delta
     & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
     }
-    { \Gamma \vdash \Singleton[A][t] \equiv \Singleton[A][t] \dashv \Delta }
+    { \Gamma \vdash \Singleton[A][t] \equiv \Singleton[B][s] \dashv \Delta }
 \]
+
+\jtodo{Convertibility for variables}
 
 Roughly speaking (for intution), two types are convertible up to evaluation, e.g. $(\lambda x. x) A \equiv A$.
 
@@ -164,11 +167,6 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \label{fig:dt-singletons-je-cong}
 \end{figure*}
 
-\jq{Should we force $A$ on both sides in JE-Sym or force convertibility?}
-\jq{What does the congruence rule look like?}
-
-% TODO: define congruence rules for each term and type constructor
-
 \subsection{Equational System}
 We define constructors and eliminators for our types.
 
@@ -179,7 +177,7 @@ We define constructors and eliminators for our types.
             & \Gamma \vdash s : B
             & \Gamma \vdash (t : A) \equiv (s : B) \dashv \Delta
             }
-            {\Gamma \vdash \val[][t] : \Singleton[B][s]}
+            {\Gamma \vdash \val[A][t] : \Singleton[B][s]}
   \]
 
   \[
@@ -215,6 +213,8 @@ We define constructors and eliminators for our types.
   \caption*{$\Bool$ Intro/Elim}
   \label{fig:dt-singletons-bool-intro-elim}
 \end{figure*}
+
+\jtodo{Fix Bool-Elim to be dependent}
 
 \jq{Conv on bool-elim for cond (i.e. $c : C$, $C \equiv \Bool$)? Our conv rel on bools is trivial so it makes no difference but I'm wondering if it would be more precise to include it anyway}
 \jq{Arbitrarily picking A as a return type in bool-elim, but should I introduce a third type and enforce conv between it, A, and B?}
