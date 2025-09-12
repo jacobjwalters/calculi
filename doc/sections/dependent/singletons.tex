@@ -144,7 +144,8 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \[
     \inference[JE-\true-Cong]{}
                     {\Gamma \vdash (\true : \Bool) \equiv (\true : \Bool) \dashv \Delta}
-    \quad
+  \]
+  \[
     \inference[JE-\false-Cong]{}
                     {\Gamma \vdash (\false : \Bool) \equiv (\false : \Bool) \dashv \Delta}
   \]
@@ -152,8 +153,8 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
   \[
   \inference[JE-\tm{ITE}-Cong]
             { \Gamma \vdash (c : \Bool) \equiv (c' : \Bool) \dashv \Delta
-            & \Gamma \vdash (t : A) \equiv (t' : A') \dashv \Delta
-            & \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
+            \\ \Gamma \vdash (t : A) \equiv (t' : A') \dashv \Delta
+            \\ \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
             }
             {\Gamma \vdash (\ite c t e : A) \equiv (\ite{c'}{t'}{e'} : A') \dashv \Delta}
   \]
@@ -252,6 +253,12 @@ We define constructors and eliminators for our types.
     \tag{$\Bool$-$\eta$}
     \ite c \true \false \equiv c
   \end{equation}
+
+  \[
+  \inference[$\Bool$-$\eta$]
+            { \Gamma \vdash c : \Bool}
+            {\Gamma \vdash \ite c \true \false : Bool}
+  \]
 
   \caption*{$\eta$ rules}
   \label{fig:dt-singletons-eta}
