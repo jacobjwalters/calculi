@@ -32,7 +32,7 @@ data Precontext : Support -> Type where
   ExtLet : Precontext n -> (v : VarName) -> Pretype n -> Preterm n -> Precontext (S n)
 
 --- RELATIONS
-{- TODO
+{- TODO List
 Relations to promote presyntax into syntax
 -}
 
