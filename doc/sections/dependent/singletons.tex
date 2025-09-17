@@ -222,13 +222,6 @@ We define constructors and eliminators for our types.
 
 
 \begin{figure*}[h]
-  \[
-  \inference[$\Singleton$-$\beta$]
-            { \Gamma \vdash \letval x {\val[A][t]} x : A
-            }
-            {\Gamma \vdash t : A}
-  \]
-
   \begin{equation}
     \tag{$\Singleton$-$\beta$}
     \letval x {\val[A][t]} x \equiv t
@@ -253,12 +246,6 @@ We define constructors and eliminators for our types.
     \tag{$\Bool$-$\eta$}
     \when c x A \true \false \equiv c
   \end{equation}
-
-  \[
-  \inference[$\Bool$-$\eta$]
-            { \Gamma \vdash c : \Bool}
-            {\Gamma \vdash \when c x A \true \false : Bool}
-  \]
 
   \caption*{$\eta$ rules}
   \label{fig:dt-singletons-eta}
