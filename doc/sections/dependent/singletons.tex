@@ -243,7 +243,7 @@ We define constructors and eliminators for our types.
 
   \begin{equation}
     \tag{$\Bool$-$\beta_{\false}$}
-    \ite \false x A t e \equiv e
+    \when \false x A t e \equiv e
   \end{equation}
 
   \caption*{$\beta$ rules}
@@ -253,13 +253,13 @@ We define constructors and eliminators for our types.
 \begin{figure*}[h]
   \begin{equation}
     \tag{$\Bool$-$\eta$}
-    \ite c x A \true \false \equiv c
+    \when c x A \true \false \equiv c
   \end{equation}
 
   \[
   \inference[$\Bool$-$\eta$]
             { \Gamma \vdash c : \Bool}
-            {\Gamma \vdash \ite c x A \true \false : Bool}
+            {\Gamma \vdash \when c x A \true \false : Bool}
   \]
 
   \caption*{$\eta$ rules}
