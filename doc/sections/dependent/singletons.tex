@@ -207,7 +207,6 @@ We define constructors and eliminators for our types.
   \[
   \inference[\Elim{$\Bool$}]
             {\Gamma \vdash c : \Bool
-            & \Gamma \vdash A \equiv B \dashv \Delta
             \\ \Gamma, (\ford : \Singleton[\Bool][c]) \equiv \val[\Bool][\true] \vdash t : A[x \mapsto \true]
             \\ \Gamma, (\ford : \Singleton[\Bool][c]) \equiv \val[\Bool][\false] \vdash e : A[x \mapsto \false]
             }
