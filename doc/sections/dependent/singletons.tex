@@ -158,8 +158,12 @@ Given two convertible types $A$ and $B$, and two terms $x : A$, $y : B$, we defi
             \\ \Gamma \vdash (t : A) \equiv (t' : A') \dashv \Delta
             & \Gamma \vdash (e : A) \equiv (e' : A') \dashv \Delta
             }
-            {\Gamma \vdash (\when c x A t e : A[x \mapsto c])
-            \\ \equiv (\when{c'}{x'}{A'}{t'}{e'} : A'[x' \mapsto c']) \dashv \Delta}
+            {\begin{aligned}
+                \Gamma &\vdash (\when c x A t e : A[x \mapsto c])
+                \\     &\equiv (\when{c'}{x'}{A'}{t'}{e'} : A'[x' \mapsto c'])
+                           \dashv \Delta
+              \end{aligned}
+            }
   \]
 
   \[
